@@ -12,4 +12,5 @@ var (
 	ErrUserGroupNotFound      = com.NewMiddleError(errors.New("user group not found"), 404, 500)
 	ErrUserGroupIdNotProvided = com.NewMiddleError(errors.New("user group id is not provided"), 400, 501)
 	ErrCreateUserGroupUnknown = com.NewMiddleError(errors.New("could not create user group: unknown error"), 500, 502)
+	ErrUserIdNotProvided      = com.NewMiddleError(errors.New("user id is not provided"), 400, 503)
 )
