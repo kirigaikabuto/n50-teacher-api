@@ -1,5 +1,10 @@
 package groups
 
+import (
+	"github.com/kirigaikabuto/n50-teacher-api/common"
+	"github.com/kirigaikabuto/n50-teacher-api/users"
+)
+
 type UserGroupService interface {
 	CreateGroup(cmd *CreateGroupCommand) (*Group, error)
 	ListGroup(cmd *ListGroupCommand) ([]Group, error)
@@ -12,13 +17,17 @@ type UserGroupService interface {
 
 type userGroupService struct {
 	userGroupStore UserGroupStore
+	userStore      users.UsersStore
 }
 
-func NewUserGroupService(userGroupStore UserGroupStore) UserGroupService {
-	return &userGroupService{userGroupStore: userGroupStore}
+func NewUserGroupService(userGroupStore UserGroupStore, uStore users.UsersStore) UserGroupService {
+	return &userGroupService{userGroupStore: userGroupStore, userStore: uStore}
 }
 
 func (u *userGroupService) CreateGroup(cmd *CreateGroupCommand) (*Group, error) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
+		return nil, ErrNoAccessPermissions
+	}
 	return u.userGroupStore.CreateGroup(&Group{
 		Name: cmd.Name,
 	})
@@ -33,6 +42,14 @@ func (u *userGroupService) GetGroupById(cmd *GetGroupByIdCommand) (*Group, error
 }
 
 func (u *userGroupService) CreateUserGroup(cmd *CreateUserGroupCommand) (*UserGroup, error) {
+	_, err := u.userGroupStore.GetGroupById(cmd.GroupId)
+	if err != nil {
+		return nil, err
+	}
+	_, err = u.userStore.Get(cmd.UserId)
+	if err != nil {
+		return nil, err
+	}
 	return u.userGroupStore.CreateUserGroup(&UserGroup{
 		UserId:  cmd.UserId,
 		GroupId: cmd.GroupId,

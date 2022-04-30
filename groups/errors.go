@@ -13,4 +13,7 @@ var (
 	ErrUserGroupIdNotProvided = com.NewMiddleError(errors.New("user group id is not provided"), 400, 501)
 	ErrCreateUserGroupUnknown = com.NewMiddleError(errors.New("could not create user group: unknown error"), 500, 502)
 	ErrUserIdNotProvided      = com.NewMiddleError(errors.New("user id is not provided"), 400, 503)
+	ErrNoUserIdInToken        = com.NewMiddleError(errors.New("no user id in token"), 400, 504)
+	ErrNoUserTypeInToken      = com.NewMiddleError(errors.New("no user type in token"), 400, 505)
+	ErrNoAccessPermissions    = com.NewMiddleError(errors.New("no access permissions"), 400, 506)
 )

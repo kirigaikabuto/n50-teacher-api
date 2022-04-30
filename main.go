@@ -130,7 +130,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	groupService := groups.NewUserGroupService(groupPostgreStore)
+	groupService := groups.NewUserGroupService(groupPostgreStore, usersPostgreStore)
 	groupHttpEndpoints := groups.NewUserGroupHttpEndpoints(setdata_common.NewCommandHandler(groupService))
 	authMdw := auth.NewMiddleware(authTokenStore)
 
@@ -142,7 +142,7 @@ func run(c *cli.Context) error {
 		Email:     adminEmail,
 		FirstName: "",
 		LastName:  "",
-		Type:      users.Admin.ToString(),
+		Type:      common.Admin.ToString(),
 	})
 
 	r := gin.Default()

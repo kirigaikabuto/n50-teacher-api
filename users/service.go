@@ -3,6 +3,7 @@ package users
 import (
 	"github.com/google/uuid"
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
+	"github.com/kirigaikabuto/n50-teacher-api/common"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 )
 
@@ -37,7 +38,7 @@ func (u *userService) CreateUser(cmd *CreateUserCommand) (*User, error) {
 		Email:     cmd.Email,
 		FirstName: cmd.FirstName,
 		LastName:  cmd.LastName,
-		Type:      ToUserType(cmd.Type),
+		Type:      common.ToUserType(cmd.Type),
 	}
 	return u.userStore.Create(user)
 }

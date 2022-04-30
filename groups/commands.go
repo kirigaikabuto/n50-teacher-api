@@ -1,7 +1,9 @@
 package groups
 
 type CreateGroupCommand struct {
-	Name string `json:"name"`
+	Name            string `json:"name"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *CreateGroupCommand) Exec(svc interface{}) (interface{}, error) {
@@ -9,6 +11,8 @@ func (cmd *CreateGroupCommand) Exec(svc interface{}) (interface{}, error) {
 }
 
 type ListGroupCommand struct {
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *ListGroupCommand) Exec(svc interface{}) (interface{}, error) {
@@ -16,7 +20,9 @@ func (cmd *ListGroupCommand) Exec(svc interface{}) (interface{}, error) {
 }
 
 type GetGroupByIdCommand struct {
-	Id string `json:"id"`
+	Id              string `json:"id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *GetGroupByIdCommand) Exec(svc interface{}) (interface{}, error) {
@@ -24,8 +30,10 @@ func (cmd *GetGroupByIdCommand) Exec(svc interface{}) (interface{}, error) {
 }
 
 type CreateUserGroupCommand struct {
-	UserId  string `json:"user_id"`
-	GroupId string `json:"group_id"`
+	UserId          string `json:"user_id"`
+	GroupId         string `json:"group_id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *CreateUserGroupCommand) Exec(svc interface{}) (interface{}, error) {
@@ -33,7 +41,9 @@ func (cmd *CreateUserGroupCommand) Exec(svc interface{}) (interface{}, error) {
 }
 
 type GetUserGroupByGroupId struct {
-	GroupId string `json:"group_id"`
+	GroupId         string `json:"group_id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *GetUserGroupByGroupId) Exec(svc interface{}) (interface{}, error) {
@@ -41,7 +51,9 @@ func (cmd *GetUserGroupByGroupId) Exec(svc interface{}) (interface{}, error) {
 }
 
 type GetUserGroupByUserId struct {
-	UserId string `json:"user_id"`
+	UserId          string `json:"user_id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *GetUserGroupByUserId) Exec(svc interface{}) (interface{}, error) {
@@ -49,7 +61,9 @@ func (cmd *GetUserGroupByUserId) Exec(svc interface{}) (interface{}, error) {
 }
 
 type DeleteUserGroupById struct {
-	Id string `json:"id"`
+	Id              string `json:"id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *DeleteUserGroupById) Exec(svc interface{}) (interface{}, error) {

@@ -2,7 +2,6 @@ package groups
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"io/ioutil"
@@ -31,6 +30,18 @@ func NewUserGroupHttpEndpoints(ch setdata_common.CommandHandler) HttpEndpoints {
 func (h *httpEndpoints) MakeCreateGroupEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &CreateGroupCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		jsonData, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
@@ -54,13 +65,24 @@ func (h *httpEndpoints) MakeCreateGroupEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeListGroupEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &ListGroupCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
 			return
 		}
-		fmt.Println(c.Get("user_id"))
-		fmt.Println(c.Get("user_type"))
+
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		respondJSON(c.Writer, http.StatusOK, resp)
 	}
@@ -69,6 +91,18 @@ func (h *httpEndpoints) MakeListGroupEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeGetGroupByIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetGroupByIdCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		id := c.Request.URL.Query().Get("id")
 		if id == "" {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
@@ -88,6 +122,18 @@ func (h *httpEndpoints) MakeGetGroupByIdEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeCreateUserGroupEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &CreateUserGroupCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		jsonData, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
@@ -111,6 +157,18 @@ func (h *httpEndpoints) MakeCreateUserGroupEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeGetUserGroupByGroupIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetUserGroupByGroupId{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		groupId := c.Request.URL.Query().Get("group_id")
 		if groupId == "" {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
@@ -130,6 +188,18 @@ func (h *httpEndpoints) MakeGetUserGroupByGroupIdEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeGetUserGroupByUserIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetUserGroupByUserId{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		userId := c.Request.URL.Query().Get("user_id")
 		if userId == "" {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrUserIdNotProvided))
@@ -149,6 +219,18 @@ func (h *httpEndpoints) MakeGetUserGroupByUserIdEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeDeleteUserGroupByIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &DeleteUserGroupById{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
 		id := c.Request.URL.Query().Get("id")
 		if id == "" {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrUserGroupIdNotProvided))
