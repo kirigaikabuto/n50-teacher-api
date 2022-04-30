@@ -6,6 +6,7 @@ import (
 )
 
 type SubjectService interface {
+
 }
 
 type subjectService struct {
