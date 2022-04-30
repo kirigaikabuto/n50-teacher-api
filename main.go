@@ -116,9 +116,10 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(authTokenStore)
+	authMdw := auth.NewMiddleware(authTokenStore)
+
 	r := gin.Default()
-	authGroup := r.Group("/users")
+	authGroup := r.Group("/users", authMdw.MakeMiddleware())
 	{
 		authGroup.POST("/")
 	}

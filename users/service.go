@@ -24,9 +24,13 @@ func NewUserService(uStore UsersStore) UserService {
 
 func (u *userService) CreateUser(cmd *CreateUserCommand) (*User, error) {
 	user := &User{
-		Id:       uuid.New().String(),
-		Username: cmd.Username,
-		Password: cmd.Password,
+		Id:        uuid.New().String(),
+		Username:  cmd.Username,
+		Password:  cmd.Password,
+		Email:     cmd.Email,
+		FirstName: cmd.FirstName,
+		LastName:  cmd.LastName,
+		Type:      ToUserType(cmd.Type),
 	}
 	return u.userStore.Create(user)
 }

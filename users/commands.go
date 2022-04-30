@@ -1,11 +1,13 @@
 package users
 
 type CreateUserCommand struct {
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	Email       string `json:"email"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	CreatedDate string `json:"created_date"`
+	Type        string `json:"type"`
 }
 
 func (cmd *CreateUserCommand) Exec(svc interface{}) (interface{}, error) {
@@ -13,12 +15,14 @@ func (cmd *CreateUserCommand) Exec(svc interface{}) (interface{}, error) {
 }
 
 type UpdateUserCommand struct {
-	Id        string `json:"id"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Email     string `json:"email"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
+	Id          string `json:"id"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	Email       string `json:"email"`
+	FirstName   string `json:"first_name"`
+	LastName    string `json:"last_name"`
+	CreatedDate string `json:"created_date"`
+	Type        string `json:"type"`
 }
 
 func (cmd *UpdateUserCommand) Exec(svc interface{}) (interface{}, error) {
@@ -55,4 +59,9 @@ type GetUserByUsernameAndPassword struct {
 
 func (cmd *GetUserByUsernameAndPassword) Exec(svc interface{}) (interface{}, error) {
 	return svc.(UserService).GetUserByUsernameAndPassword(cmd)
+}
+
+type LoginCommand struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
