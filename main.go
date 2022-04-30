@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	"github.com/kirigaikabuto/n50-teacher-api/groups"
+	"github.com/kirigaikabuto/n50-teacher-api/subjects"
 	"github.com/kirigaikabuto/n50-teacher-api/users"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"github.com/rs/zerolog/log"
@@ -134,8 +136,15 @@ func run(c *cli.Context) error {
 	groupHttpEndpoints := groups.NewUserGroupHttpEndpoints(setdata_common.NewCommandHandler(groupService))
 	authMdw := auth.NewMiddleware(authTokenStore)
 
-	//create admin
+	//subjects store
+	subjectPostgreStore, err := subjects.NewSubjectPostgreStore(cfg)
+	if err != nil {
+		return err
+	}
+	subjectService := subjects.NewSubjectService(subjectPostgreStore, usersPostgreStore, groupPostgreStore)
+	fmt.Println(subjectService)
 
+	//create admin
 	usersService.CreateUser(&users.CreateUserCommand{
 		Username:  adminUsername,
 		Password:  adminPassword,
