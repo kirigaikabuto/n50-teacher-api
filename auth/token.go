@@ -17,4 +17,10 @@ type TokenDetails struct {
 type AccessDetails struct {
 	AccessUuid string
 	UserId     string
+	UserType   string
+}
+
+type CreateTokenCommand struct {
+	UserId   string
+	UserType string
 }

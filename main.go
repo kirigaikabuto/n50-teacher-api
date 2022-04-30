@@ -132,7 +132,7 @@ func run(c *cli.Context) error {
 	}
 	groupService := groups.NewUserGroupService(groupPostgreStore)
 	groupHttpEndpoints := groups.NewUserGroupHttpEndpoints(setdata_common.NewCommandHandler(groupService))
-	//authMdw := auth.NewMiddleware(authTokenStore)
+	authMdw := auth.NewMiddleware(authTokenStore)
 
 	//create admin
 
@@ -150,13 +150,13 @@ func run(c *cli.Context) error {
 	{
 		authGroup.POST("/login", usersHttpEndpoints.MakeLoginEndpoint())
 	}
-	groupGroups := r.Group("/group")
+	groupGroups := r.Group("/group", authMdw.MakeMiddleware())
 	{
 		groupGroups.POST("/", groupHttpEndpoints.MakeCreateGroupEndpoint())
 		groupGroups.GET("/", groupHttpEndpoints.MakeListGroupEndpoint())
 		groupGroups.GET("/id", groupHttpEndpoints.MakeGetGroupByIdEndpoint())
 	}
-	userGroupGroups := r.Group("/userGroups")
+	userGroupGroups := r.Group("/userGroup", authMdw.MakeMiddleware())
 	{
 		userGroupGroups.POST("/", groupHttpEndpoints.MakeCreateUserGroupEndpoint())
 		userGroupGroups.GET("/groupId", groupHttpEndpoints.MakeGetUserGroupByGroupIdEndpoint())

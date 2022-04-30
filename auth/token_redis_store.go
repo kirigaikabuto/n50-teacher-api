@@ -30,7 +30,7 @@ func NewTokenStore(config RedisConfig) (TokenStore, error) {
 	return &tokenStore{redisClient: client}, nil
 }
 
-func (t *tokenStore) CreateToken(userId string) (*TokenDetails, error) {
+func (t *tokenStore) CreateToken(cmd *CreateTokenCommand) (*TokenDetails, error) {
 	td := &TokenDetails{}
 	td.AtExpires = time.Now().Add(time.Minute * 45).Unix()
 	td.AccessUuid = uuid.New().String()
@@ -41,9 +41,10 @@ func (t *tokenStore) CreateToken(userId string) (*TokenDetails, error) {
 	_ = os.Setenv("REFRESH_SECRET", refreshSecret)
 	atClaims := jwt.MapClaims{}
 	atClaims["authorized"] = true
-	atClaims["user_id"] = userId
+	atClaims["user_id"] = cmd.UserId
 	atClaims["exp"] = td.AtExpires
 	atClaims["access_uuid"] = td.AccessUuid
+	atClaims["user_type"] = cmd.UserType
 	at := jwt.NewWithClaims(jwt.SigningMethodHS256, atClaims)
 	td.AccessToken, err = at.SignedString([]byte(os.Getenv("ACCESS_SECRET")))
 	if err != nil {
@@ -51,8 +52,9 @@ func (t *tokenStore) CreateToken(userId string) (*TokenDetails, error) {
 	}
 	rtClaims := jwt.MapClaims{}
 	rtClaims["refresh_uuid"] = td.RefreshUuid
-	rtClaims["user_id"] = userId
+	rtClaims["user_id"] = cmd.UserId
 	rtClaims["exp"] = td.RtExpires
+	rtClaims["user_type"] = cmd.UserType
 	rt := jwt.NewWithClaims(jwt.SigningMethodHS256, rtClaims)
 	td.RefreshToken, err = rt.SignedString([]byte(os.Getenv("REFRESH_SECRET")))
 	if err != nil {
@@ -63,11 +65,11 @@ func (t *tokenStore) CreateToken(userId string) (*TokenDetails, error) {
 	rT := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	err = t.redisClient.Set(accessKeyName+":"+td.AccessUuid, userId, aT.Sub(now)).Err()
+	err = t.redisClient.Set(accessKeyName+":"+td.AccessUuid, cmd.UserId, aT.Sub(now)).Err()
 	if err != nil {
 		return nil, err
 	}
-	err = t.redisClient.Set(refreshKeyName+":"+td.RefreshUuid, userId, rT.Sub(now)).Err()
+	err = t.redisClient.Set(refreshKeyName+":"+td.RefreshUuid, cmd.UserId, rT.Sub(now)).Err()
 	if err != nil {
 		return nil, err
 	}

@@ -95,7 +95,10 @@ func (u *userService) Login(cmd *LoginCommand) (*auth.TokenDetails, error) {
 	if err != nil {
 		return nil, err
 	}
-	token, err := u.tokenStore.CreateToken(user.Id)
+	token, err := u.tokenStore.CreateToken(&auth.CreateTokenCommand{
+		UserId:   user.Id,
+		UserType: user.Type.ToString(),
+	})
 	if err != nil {
 		return nil, err
 	}

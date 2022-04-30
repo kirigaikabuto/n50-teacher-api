@@ -34,9 +34,9 @@ func (m *Middleware) MakeMiddleware() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		fmt.Println(tokenAuth)
 		c.Set("user_id", tokenAuth.UserId)
 		c.Set("access_uuid", tokenAuth.AccessUuid)
+		c.Set("user_type", tokenAuth.UserType)
 		c.Next()
 	}
 }
@@ -72,6 +72,7 @@ func (m *Middleware) ExtractTokenMetadata(r *http.Request) (*AccessDetails, erro
 			return nil, errors.New("not access uuid")
 		}
 		userId := claims["user_id"].(string)
+		userType := claims["user_type"].(string)
 		_, err = m.tokenStore.GetToken(accessUuid)
 		if err != nil {
 			return nil, err
@@ -79,6 +80,7 @@ func (m *Middleware) ExtractTokenMetadata(r *http.Request) (*AccessDetails, erro
 		return &AccessDetails{
 			AccessUuid: accessUuid,
 			UserId:     userId,
+			UserType:   userType,
 		}, nil
 	}
 	return nil, errors.New("error during extract of token metadata")

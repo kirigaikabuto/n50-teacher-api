@@ -2,6 +2,7 @@ package groups
 
 import (
 	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"io/ioutil"
@@ -58,6 +59,8 @@ func (h *httpEndpoints) MakeListGroupEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
 			return
 		}
+		fmt.Println(c.Get("user_id"))
+		fmt.Println(c.Get("user_type"))
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		respondJSON(c.Writer, http.StatusOK, resp)
 	}
