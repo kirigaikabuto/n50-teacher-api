@@ -65,11 +65,12 @@ func (h *httpEndpoints) MakeListGroupEndpoint() gin.HandlerFunc {
 func (h *httpEndpoints) MakeGetGroupByIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetGroupByIdCommand{}
-		groupId := c.Request.URL.Query().Get("id")
-		if groupId == "" {
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
 			return
 		}
+		cmd.Id = id
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
@@ -111,6 +112,7 @@ func (h *httpEndpoints) MakeGetGroupByGroupIdEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
 			return
 		}
+		cmd.GroupId = groupId
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
@@ -129,6 +131,7 @@ func (h *httpEndpoints) MakeGetGroupByUserIdEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrUserIdNotProvided))
 			return
 		}
+		cmd.UserId = userId
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
@@ -147,6 +150,7 @@ func (h *httpEndpoints) MakeDeleteGroupByIdEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrUserGroupIdNotProvided))
 			return
 		}
+		cmd.Id = id
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
