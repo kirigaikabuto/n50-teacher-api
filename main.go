@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	"github.com/kirigaikabuto/n50-teacher-api/users"
 	"github.com/rs/zerolog/log"
@@ -34,6 +35,8 @@ var (
 	postgresPort            = 5432
 	postgresParams          = ""
 	port                    = "8080"
+	redisHost               = ""
+	redisPort               = ""
 	flags                   = []cli.Flag{
 		&cli.StringFlag{
 			Name:        "config, c",
@@ -69,6 +72,8 @@ func parseEnvFile() {
 	s3secretKey = viper.GetString("s3.primary.s3secretKey")
 	s3uploadedFilesBasePath = viper.GetString("s3.primary.s3uploadedFilesBasePath")
 	s3region = viper.GetString("s3.primary.s3region")
+	redisHost = viper.GetString("redis.primary.host")
+	redisPort = viper.GetString("redis.primary.port")
 }
 
 func run(c *cli.Context) error {
@@ -103,8 +108,16 @@ func run(c *cli.Context) error {
 	}
 	usersService := users.NewUserService(usersPostgreStore)
 	fmt.Println(usersService)
+
+	authTokenStore, err := auth.NewTokenStore(auth.RedisConfig{
+		Host: redisHost,
+		Port: redisPort,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Println(authTokenStore)
 	r := gin.Default()
-	//r.Use(apiKewMdw.MakeCorsMiddleware())
 	authGroup := r.Group("/users")
 	{
 		authGroup.POST("/")
