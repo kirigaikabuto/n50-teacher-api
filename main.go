@@ -7,6 +7,7 @@ import (
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	"github.com/kirigaikabuto/n50-teacher-api/users"
+	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/viper"
 	"github.com/urfave/cli"
@@ -114,7 +115,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	authMdw := auth.NewMiddleware(authTokenStore)
+	//authMdw := auth.NewMiddleware(authTokenStore)
 
 	usersPostgreStore, err := users.NewPostgresUsersStore(cfg)
 	if err != nil {
@@ -130,9 +131,10 @@ func run(c *cli.Context) error {
 		Type:      users.Admin.ToString(),
 	})
 	r := gin.Default()
-	authGroup := r.Group("/users", authMdw.MakeMiddleware())
+	usersHttpEndpoints := users.NewUsersHttpEndpoints(setdata_common.NewCommandHandler(usersService))
+	authGroup := r.Group("/auth")
 	{
-		authGroup.POST("/")
+		authGroup.POST("/login", usersHttpEndpoints.MakeLoginEndpoint())
 	}
 	log.Info().Msg("app is running on port:" + port)
 	server := &http.Server{

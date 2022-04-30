@@ -65,3 +65,7 @@ type LoginCommand struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
+
+func (cmd *LoginCommand) Exec(svc interface{}) (interface{}, error) {
+	return svc.(UserService).Login(cmd)
+}
