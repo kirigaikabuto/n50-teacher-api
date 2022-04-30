@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
@@ -37,6 +36,9 @@ var (
 	port                    = "8080"
 	redisHost               = ""
 	redisPort               = ""
+	adminUsername           = ""
+	adminPassword           = ""
+	adminEmail              = ""
 	flags                   = []cli.Flag{
 		&cli.StringFlag{
 			Name:        "config, c",
@@ -74,6 +76,9 @@ func parseEnvFile() {
 	s3region = viper.GetString("s3.primary.s3region")
 	redisHost = viper.GetString("redis.primary.host")
 	redisPort = viper.GetString("redis.primary.port")
+	adminUsername = viper.GetString("user.admin.username")
+	adminPassword = viper.GetString("user.admin.password")
+	adminEmail = viper.GetString("user.admin.email")
 }
 
 func run(c *cli.Context) error {
@@ -102,13 +107,6 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	usersPostgreStore, err := users.NewPostgresUsersStore(cfg)
-	if err != nil {
-		return err
-	}
-	usersService := users.NewUserService(usersPostgreStore)
-	fmt.Println(usersService)
-
 	authTokenStore, err := auth.NewTokenStore(auth.RedisConfig{
 		Host: redisHost,
 		Port: redisPort,
@@ -118,6 +116,19 @@ func run(c *cli.Context) error {
 	}
 	authMdw := auth.NewMiddleware(authTokenStore)
 
+	usersPostgreStore, err := users.NewPostgresUsersStore(cfg)
+	if err != nil {
+		return err
+	}
+	usersService := users.NewUserService(usersPostgreStore, authTokenStore)
+	usersService.CreateUser(&users.CreateUserCommand{
+		Username:  adminUsername,
+		Password:  adminPassword,
+		Email:     adminEmail,
+		FirstName: "",
+		LastName:  "",
+		Type:      users.Admin.ToString(),
+	})
 	r := gin.Default()
 	authGroup := r.Group("/users", authMdw.MakeMiddleware())
 	{

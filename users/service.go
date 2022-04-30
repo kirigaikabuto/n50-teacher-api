@@ -2,6 +2,7 @@ package users
 
 import (
 	"github.com/google/uuid"
+	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 )
 
@@ -15,14 +16,19 @@ type UserService interface {
 }
 
 type userService struct {
-	userStore UsersStore
+	userStore  UsersStore
+	tokenStore auth.TokenStore
 }
 
-func NewUserService(uStore UsersStore) UserService {
-	return &userService{userStore: uStore}
+func NewUserService(uStore UsersStore, aStore auth.TokenStore) UserService {
+	return &userService{userStore: uStore, tokenStore: aStore}
 }
 
 func (u *userService) CreateUser(cmd *CreateUserCommand) (*User, error) {
+	_, err := u.userStore.GetByUsernameAndPassword(cmd.Username, cmd.Password)
+	if err != ErrUserNotFound {
+		return nil, ErrUserWithUsernameAlreadyExist
+	}
 	user := &User{
 		Id:        uuid.New().String(),
 		Username:  cmd.Username,
@@ -57,6 +63,9 @@ func (u *userService) UpdateUser(cmd *UpdateUserCommand) (*User, error) {
 	}
 	if cmd.Username != "" && cmd.Username != oldUser.Username {
 		userUpdate.Username = &cmd.Username
+	}
+	if cmd.Email != "" && cmd.Email != oldUser.Email {
+		userUpdate.Email = &cmd.Email
 	}
 	return u.userStore.Update(userUpdate)
 }

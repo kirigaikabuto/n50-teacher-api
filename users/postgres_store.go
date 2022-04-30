@@ -18,7 +18,7 @@ var marketplaceAppRepoQueries = []string{
 		email TEXT,
 		first_name TEXT,
 		last_name TEXT,
-		type Text,
+		type TEXT,
 		created_date date,
 		PRIMARY KEY(id)
 	);`,
