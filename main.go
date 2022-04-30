@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
+	"github.com/kirigaikabuto/n50-teacher-api/groups"
 	"github.com/kirigaikabuto/n50-teacher-api/users"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"github.com/rs/zerolog/log"
@@ -115,13 +116,26 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	//authMdw := auth.NewMiddleware(authTokenStore)
 
+	//users store
 	usersPostgreStore, err := users.NewPostgresUsersStore(cfg)
 	if err != nil {
 		return err
 	}
 	usersService := users.NewUserService(usersPostgreStore, authTokenStore)
+	usersHttpEndpoints := users.NewUsersHttpEndpoints(setdata_common.NewCommandHandler(usersService))
+
+	//groups store
+	groupPostgreStore, err := groups.NewUserGroupPostgreStore(cfg)
+	if err != nil {
+		return err
+	}
+	groupService := groups.NewUserGroupService(groupPostgreStore)
+	groupHttpEndpoints := groups.NewUserGroupHttpEndpoints(setdata_common.NewCommandHandler(groupService))
+	//authMdw := auth.NewMiddleware(authTokenStore)
+
+	//create admin
+
 	usersService.CreateUser(&users.CreateUserCommand{
 		Username:  adminUsername,
 		Password:  adminPassword,
@@ -130,11 +144,24 @@ func run(c *cli.Context) error {
 		LastName:  "",
 		Type:      users.Admin.ToString(),
 	})
+
 	r := gin.Default()
-	usersHttpEndpoints := users.NewUsersHttpEndpoints(setdata_common.NewCommandHandler(usersService))
 	authGroup := r.Group("/auth")
 	{
 		authGroup.POST("/login", usersHttpEndpoints.MakeLoginEndpoint())
+	}
+	groupGroups := r.Group("/group")
+	{
+		groupGroups.POST("/", groupHttpEndpoints.MakeCreateGroupEndpoint())
+		groupGroups.GET("/", groupHttpEndpoints.MakeListGroupEndpoint())
+		groupGroups.GET("/id", groupHttpEndpoints.MakeGetGroupByIdEndpoint())
+	}
+	userGroupGroups := r.Group("/userGroups")
+	{
+		userGroupGroups.POST("/", groupHttpEndpoints.MakeCreateUserGroupEndpoint())
+		userGroupGroups.GET("/groupId", groupHttpEndpoints.MakeGetUserGroupByGroupIdEndpoint())
+		userGroupGroups.GET("/userId", groupHttpEndpoints.MakeGetUserGroupByUserIdEndpoint())
+		userGroupGroups.DELETE("/", groupHttpEndpoints.MakeDeleteUserGroupByIdEndpoint())
 	}
 	log.Info().Msg("app is running on port:" + port)
 	server := &http.Server{
@@ -144,6 +171,7 @@ func run(c *cli.Context) error {
 	go func() {
 		if err := server.ListenAndServe(); err != nil && errors.Is(err, http.ErrServerClosed) {
 			log.Error().Err(err).Msg("Server ListenAndServe error")
+			return
 		}
 	}()
 	quit := make(chan os.Signal)
@@ -172,6 +200,6 @@ func main() {
 	app.Action = run
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Err(err)
+		log.Info().Msg(err.Error())
 	}
 }

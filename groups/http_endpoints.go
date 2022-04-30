@@ -12,10 +12,11 @@ type HttpEndpoints interface {
 	MakeCreateGroupEndpoint() gin.HandlerFunc
 	MakeListGroupEndpoint() gin.HandlerFunc
 	MakeGetGroupByIdEndpoint() gin.HandlerFunc
+
 	MakeCreateUserGroupEndpoint() gin.HandlerFunc
-	MakeGetGroupByGroupIdEndpoint() gin.HandlerFunc
-	MakeGetGroupByUserIdEndpoint() gin.HandlerFunc
-	MakeDeleteGroupByIdEndpoint() gin.HandlerFunc
+	MakeGetUserGroupByGroupIdEndpoint() gin.HandlerFunc
+	MakeGetUserGroupByUserIdEndpoint() gin.HandlerFunc
+	MakeDeleteUserGroupByIdEndpoint() gin.HandlerFunc
 }
 
 type httpEndpoints struct {
@@ -104,7 +105,7 @@ func (h *httpEndpoints) MakeCreateUserGroupEndpoint() gin.HandlerFunc {
 	}
 }
 
-func (h *httpEndpoints) MakeGetGroupByGroupIdEndpoint() gin.HandlerFunc {
+func (h *httpEndpoints) MakeGetUserGroupByGroupIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetUserGroupByGroupId{}
 		groupId := c.Request.URL.Query().Get("group_id")
@@ -123,7 +124,7 @@ func (h *httpEndpoints) MakeGetGroupByGroupIdEndpoint() gin.HandlerFunc {
 	}
 }
 
-func (h *httpEndpoints) MakeGetGroupByUserIdEndpoint() gin.HandlerFunc {
+func (h *httpEndpoints) MakeGetUserGroupByUserIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetUserGroupByUserId{}
 		userId := c.Request.URL.Query().Get("user_id")
@@ -142,7 +143,7 @@ func (h *httpEndpoints) MakeGetGroupByUserIdEndpoint() gin.HandlerFunc {
 	}
 }
 
-func (h *httpEndpoints) MakeDeleteGroupByIdEndpoint() gin.HandlerFunc {
+func (h *httpEndpoints) MakeDeleteUserGroupByIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &DeleteUserGroupById{}
 		id := c.Request.URL.Query().Get("id")
