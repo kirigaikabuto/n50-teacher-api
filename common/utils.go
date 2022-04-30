@@ -45,25 +45,24 @@ func IsAvailableResource(currentType string, neededTypes []string) bool {
 	return false
 }
 
-
 type UserType string
 
 var (
-	Admin   UserType = "админ"
-	Teacher UserType = "учитель"
-	Student UserType = "ученик"
+	Admin   UserType = "admin"
+	Teacher UserType = "teacher"
+	Student UserType = "student"
 )
 
 var (
 	userTypeToString = map[UserType]string{
-		Admin:   "админ",
-		Teacher: "учитель",
-		Student: "ученик",
+		Admin:   "admin",
+		Teacher: "teacher",
+		Student: "student",
 	}
 	stringToUserType = map[string]UserType{
-		"админ":   Admin,
-		"учитель": Teacher,
-		"ученик":  Student,
+		"admin":   Admin,
+		"teacher": Teacher,
+		"student": Student,
 	}
 )
 
@@ -76,7 +75,7 @@ func ToUserType(s string) UserType {
 }
 
 func IsUserTypeExist(s string) bool {
-	userTypes := []string{"админ", "учитель", "ученик"}
+	userTypes := []string{"admin", "teacher", "student"}
 	for _, v := range userTypes {
 		if v == s {
 			return true

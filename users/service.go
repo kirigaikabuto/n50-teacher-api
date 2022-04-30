@@ -15,6 +15,7 @@ type UserService interface {
 	ListUser(cmd *ListUserCommand) ([]User, error)
 	GetUserByUsernameAndPassword(cmd *GetUserByUsernameAndPassword) (*User, error)
 	Login(cmd *LoginCommand) (*auth.TokenDetails, error)
+	CreateUserByAdmin(cmd *CreateUserByAdminCommand) (*User, error)
 }
 
 type userService struct {
@@ -24,6 +25,29 @@ type userService struct {
 
 func NewUserService(uStore UsersStore, aStore auth.TokenStore) UserService {
 	return &userService{userStore: uStore, tokenStore: aStore}
+}
+
+func (u *userService) CreateUserByAdmin(cmd *CreateUserByAdminCommand) (*User, error) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Admin.ToString()}) {
+		return nil, ErrNoAccessPermissions
+	}
+	_, err := u.userStore.GetByUsernameAndPassword(cmd.Username, cmd.Password)
+	if err != ErrUserNotFound {
+		return nil, ErrUserWithUsernameAlreadyExist
+	}
+	if !common.IsUserTypeExist(cmd.Type) {
+		return nil, ErrNoSuchUserType
+	}
+	user := &User{
+		Id:        uuid.New().String(),
+		Username:  cmd.Username,
+		Password:  cmd.Password,
+		Email:     cmd.Email,
+		FirstName: cmd.FirstName,
+		LastName:  cmd.LastName,
+		Type:      common.ToUserType(cmd.Type),
+	}
+	return u.userStore.Create(user)
 }
 
 func (u *userService) CreateUser(cmd *CreateUserCommand) (*User, error) {

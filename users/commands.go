@@ -1,5 +1,21 @@
 package users
 
+type CreateUserByAdminCommand struct {
+	Username        string `json:"username"`
+	Password        string `json:"password"`
+	Email           string `json:"email"`
+	FirstName       string `json:"first_name"`
+	LastName        string `json:"last_name"`
+	CreatedDate     string `json:"created_date"`
+	Type            string `json:"type"`
+	CurrentUserId   string `json:"-"`
+	CurrentUserType string `json:"-"`
+}
+
+func (cmd *CreateUserByAdminCommand) Exec(svc interface{}) (interface{}, error) {
+	return svc.(UserService).CreateUserByAdmin(cmd)
+}
+
 type CreateUserCommand struct {
 	Username    string `json:"username"`
 	Password    string `json:"password"`

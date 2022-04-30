@@ -10,6 +10,7 @@ import (
 
 type HttpEndpoints interface {
 	MakeLoginEndpoint() gin.HandlerFunc
+	MakeCreateUserByAdminEndpoint() gin.HandlerFunc
 }
 
 type httpEndpoints struct {
@@ -40,6 +41,41 @@ func (h *httpEndpoints) MakeLoginEndpoint() gin.HandlerFunc {
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		respondJSON(c.Writer, http.StatusOK, resp)
+	}
+}
+
+func (h *httpEndpoints) MakeCreateUserByAdminEndpoint() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cmd := &CreateUserByAdminCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		jsonData, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		err = json.Unmarshal(jsonData, &cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusCreated, resp)
 	}
 }
 
