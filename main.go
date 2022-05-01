@@ -7,6 +7,7 @@ import (
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	"github.com/kirigaikabuto/n50-teacher-api/groups"
+	"github.com/kirigaikabuto/n50-teacher-api/lessons"
 	"github.com/kirigaikabuto/n50-teacher-api/subjects"
 	"github.com/kirigaikabuto/n50-teacher-api/users"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
@@ -142,6 +143,15 @@ func run(c *cli.Context) error {
 	}
 	subjectService := subjects.NewSubjectService(subjectPostgreStore, usersPostgreStore, groupPostgreStore)
 	subjectHttpEndpoints := subjects.NewSubjectsHttpEndpoints(setdata_common.NewCommandHandler(subjectService))
+
+	//lessons store
+	lessonsPostgreStore, err := lessons.NewLessonsPostgreStore(cfg)
+	if err != nil {
+		return err
+	}
+	lessonService := lessons.NewLessonService(lessonsPostgreStore)
+	lessonHttpEndpoints := lessons.NewLessonHttpEndpoints(setdata_common.NewCommandHandler(lessonService))
+
 	//create admin
 	usersService.CreateUser(&users.CreateUserCommand{
 		Username:  adminUsername,
@@ -192,6 +202,14 @@ func run(c *cli.Context) error {
 		groupSubjectGroup.GET("/id", subjectHttpEndpoints.MakeGetGroupSubjectsByIdEndpoint())
 		groupSubjectGroup.GET("/teacherSubId", subjectHttpEndpoints.MakeGetGroupSubjectByIdTeacherSubEndpoint())
 		groupSubjectGroup.GET("/groupId", subjectHttpEndpoints.MakeGetGroupSubjectByGroupIdEndpoint())
+	}
+	lessonGroup := r.Group("/lesson", authMdw.MakeMiddleware())
+	{
+		lessonGroup.POST("/", lessonHttpEndpoints.MakeCreateLessonEndpoint())
+		lessonGroup.GET("/", lessonHttpEndpoints.MakeGetLessonByIdEndpoint())
+		lessonGroup.GET("/groupSubjectId", lessonHttpEndpoints.MakeListLessonByGroupSubjectIdEndpoint())
+		lessonGroup.PUT("/", lessonHttpEndpoints.MakeUpdateLessonEndpoint())
+		lessonGroup.DELETE("/", lessonHttpEndpoints.MakeDeleteLessonEndpoint())
 	}
 	log.Info().Msg("app is running on port:" + port)
 	server := &http.Server{
