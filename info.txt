@@ -1,0 +1,26 @@
+subjects:
+    math
+    history
+
+teachers:
+    teacher1
+    teacher2
+
+students:
+    student1
+    student2
+
+groups:
+    group1{student1,student2}
+
+teacherSubject:
+    teacherSubject1{math,teacher1}
+    teacherSubject2{history,teacher2}
+
+groupSubject:
+    groupSubject1{teacherSubject1, group1}
+    groupSubject2{teacherSubject2, group1}
+
+lessons:
+    lesson1{groupSubject1}
+    lesson2{groupSubject1}
