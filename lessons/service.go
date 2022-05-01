@@ -5,6 +5,7 @@ import (
 	"github.com/kirigaikabuto/n50-teacher-api/subjects"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 type LessonService interface {
@@ -93,10 +94,10 @@ func (l *lessonService) DeleteLesson(cmd *DeleteLessonCommand) error {
 func (l *lessonService) UploadFile(cmd *UploadFileCommand) error {
 	folderCreateDir := "./videos/"
 	err := os.Mkdir(folderCreateDir, 0700)
-	if err != nil {
+	if err != nil && !strings.Contains(err.Error(), "that file already exists.") {
 		return err
 	}
-	videoFolderName := "video_" + cmd.Name + "/"
+	videoFolderName := "video_" + cmd.Id + "/"
 	videoFullPath := folderCreateDir + videoFolderName
 	err = os.Mkdir(videoFullPath, 0700)
 	if err != nil {
