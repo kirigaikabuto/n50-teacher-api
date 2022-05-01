@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"errors"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/kirigaikabuto/n50-teacher-api/auth"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
@@ -142,8 +141,7 @@ func run(c *cli.Context) error {
 		return err
 	}
 	subjectService := subjects.NewSubjectService(subjectPostgreStore, usersPostgreStore, groupPostgreStore)
-	fmt.Println(subjectService)
-
+	subjectHttpEndpoints := subjects.NewSubjectsHttpEndpoints(setdata_common.NewCommandHandler(subjectService))
 	//create admin
 	usersService.CreateUser(&users.CreateUserCommand{
 		Username:  adminUsername,
@@ -172,6 +170,28 @@ func run(c *cli.Context) error {
 		userGroupGroups.GET("/groupId", groupHttpEndpoints.MakeGetUserGroupByGroupIdEndpoint())
 		userGroupGroups.GET("/userId", groupHttpEndpoints.MakeGetUserGroupByUserIdEndpoint())
 		userGroupGroups.DELETE("/", groupHttpEndpoints.MakeDeleteUserGroupByIdEndpoint())
+	}
+	subjectsGroups := r.Group("/subjects", authMdw.MakeMiddleware())
+	{
+		subjectsGroups.POST("/", subjectHttpEndpoints.MakeCreateSubjectEndpoint())
+		subjectsGroups.GET("/id", subjectHttpEndpoints.MakeGetSubjectByIdEndpoint())
+		subjectsGroups.GET("/", subjectHttpEndpoints.MakeListSubjectsEndpoint())
+	}
+	teacherSubjectGroup := r.Group("/teacherSubject", authMdw.MakeMiddleware())
+	{
+		teacherSubjectGroup.POST("/", subjectHttpEndpoints.MakeCreateTeacherSubjectEndpoint())
+		teacherSubjectGroup.GET("/", subjectHttpEndpoints.MakeListTeacherSubjectsEndpoint())
+		teacherSubjectGroup.GET("/id", subjectHttpEndpoints.MakeGetTeacherSubjectByIdEndpoint())
+		teacherSubjectGroup.GET("/teacherId", subjectHttpEndpoints.MakeGetTeacherSubjectsByTeacherIdEndpoint())
+		teacherSubjectGroup.GET("/subjectId", subjectHttpEndpoints.MakeGetTeacherSubjectsBySubjectIdEndpoint())
+	}
+	groupSubjectGroup := r.Group("/groupSubject", authMdw.MakeMiddleware())
+	{
+		groupSubjectGroup.POST("/", subjectHttpEndpoints.MakeCreateGroupSubjectEndpoint())
+		groupSubjectGroup.GET("/", subjectHttpEndpoints.MakeListGroupSubjectsEndpoint())
+		groupSubjectGroup.GET("/id", subjectHttpEndpoints.MakeGetGroupSubjectsByIdEndpoint())
+		groupSubjectGroup.GET("/teacherSubId", subjectHttpEndpoints.MakeGetGroupSubjectByIdTeacherSubEndpoint())
+		groupSubjectGroup.GET("/groupId", subjectHttpEndpoints.MakeGetGroupSubjectByGroupIdEndpoint())
 	}
 	log.Info().Msg("app is running on port:" + port)
 	server := &http.Server{

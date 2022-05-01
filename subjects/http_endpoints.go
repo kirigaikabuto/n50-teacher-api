@@ -70,74 +70,365 @@ func (h *httpEndpoints) MakeCreateSubjectEndpoint() gin.HandlerFunc {
 }
 
 func (h *httpEndpoints) MakeListSubjectsEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
+	return func(c *gin.Context) {
+		cmd := &ListSubjectsCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
 
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetSubjectByIdEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetSubjectByIdCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrSubjectIdNotProvided))
+			return
+		}
+		cmd.Id = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeCreateTeacherSubjectEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &CreateTeacherSubjectCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		jsonData, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		err = json.Unmarshal(jsonData, &cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusCreated, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeListTeacherSubjectsEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &ListTeacherSubjectsCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetTeacherSubjectByIdEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetTeacherSubjectByIdCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrTeacherSubjectIdNotProvided))
+			return
+		}
+		cmd.Id = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetTeacherSubjectsByTeacherIdEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetTeacherSubjectsByTeacherIdCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrTeacherIdNotProvided))
+			return
+		}
+		cmd.TeacherId = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetTeacherSubjectsBySubjectIdEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetTeacherSubjectsBySubjectIdCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrSubjectIdNotProvided))
+			return
+		}
+		cmd.SubjectId = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeCreateGroupSubjectEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &CreateGroupSubjectCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		jsonData, err := ioutil.ReadAll(c.Request.Body)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		err = json.Unmarshal(jsonData, &cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusCreated, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeListGroupSubjectsEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &ListGroupSubjectsCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetGroupSubjectsByIdEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetGroupSubjectByGroupId{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupSubjectIdNotProvided))
+			return
+		}
+		cmd.GroupId = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetGroupSubjectByIdTeacherSubEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetGroupSubjectByIdTeacherSub{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrTeacherSubjectIdNotProvided))
+			return
+		}
+		cmd.TeacherSubjectId = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
 func (h *httpEndpoints) MakeGetGroupSubjectByGroupIdEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
-
+	return func(c *gin.Context) {
+		cmd := &GetGroupSubjectByGroupId{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
+			return
+		}
+		cmd.GroupId = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 
