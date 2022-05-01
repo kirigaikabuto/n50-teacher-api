@@ -22,4 +22,6 @@ var (
 	ErrGroupSubjectNotFound      = com.NewMiddleError(errors.New("group subject not found"), 404, 610)
 	ErrGroupSubjectIdNotProvided = com.NewMiddleError(errors.New("group subject id is not provided"), 400, 611)
 	ErrCreateGroupSubjectUnknown = com.NewMiddleError(errors.New("could not create group subject: unknown error"), 500, 612)
+
+	ErrInsertedUserIsNotTeacher = com.NewMiddleError(errors.New("inserted user is not teahcer"), 400, 613)
 )
