@@ -26,4 +26,5 @@ var (
 	ErrInsertedUserIsNotTeacher = com.NewMiddleError(errors.New("inserted user is not teahcer"), 400, 613)
 	ErrTeacherIdNotProvided     = com.NewMiddleError(errors.New("teacher id not provided"), 400, 614)
 	ErrGroupIdNotProvided       = com.NewMiddleError(errors.New("group id not provided"), 400, 615)
+	ErrNoTeacherId              = com.NewMiddleError(errors.New("no teacher id"), 400, 616)
 )

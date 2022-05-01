@@ -341,7 +341,7 @@ func (h *httpEndpoints) MakeListGroupSubjectsEndpoint() gin.HandlerFunc {
 
 func (h *httpEndpoints) MakeGetGroupSubjectsByIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		cmd := &GetGroupSubjectByGroupId{}
+		cmd := &GetGroupSubjectById{}
 		currentUserId, ok := c.Get("user_id")
 		if !ok {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
@@ -359,7 +359,7 @@ func (h *httpEndpoints) MakeGetGroupSubjectsByIdEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupSubjectIdNotProvided))
 			return
 		}
-		cmd.GroupId = id
+		cmd.Id = id
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))

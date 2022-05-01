@@ -67,6 +67,13 @@ func (s *subjectService) CreateTeacherSubject(cmd *CreateTeacherSubjectCommand) 
 	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
 		return nil, ErrNoAccessPermissions
 	}
+	if cmd.TeacherId == "" {
+		if cmd.CurrentUserType == common.Teacher.ToString() {
+			cmd.TeacherId = cmd.CurrentUserId
+		} else if cmd.CurrentUserType == common.Admin.ToString() {
+			return nil, ErrNoTeacherId
+		}
+	}
 	teacher, err := s.userStore.Get(cmd.TeacherId)
 	if err != nil {
 		return nil, err
