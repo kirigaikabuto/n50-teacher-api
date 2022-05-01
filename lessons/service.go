@@ -55,6 +55,7 @@ func (l *lessonService) GetLessonById(cmd *GetLessonByIdCommand) (*Lesson, error
 
 func (l *lessonService) UpdateLesson(cmd *UpdateLessonCommand) (*Lesson, error) {
 	updateLesson := &LessonUpdate{}
+	updateLesson.Id = cmd.Id
 	oldLesson, err := l.lessonStore.GetLessonById(cmd.Id)
 	if err != nil {
 		return nil, err
@@ -72,6 +73,10 @@ func (l *lessonService) UpdateLesson(cmd *UpdateLessonCommand) (*Lesson, error) 
 		updateLesson.DocumentFileUrl = &cmd.DocumentFileUrl
 	}
 	if cmd.GroupSubjectId != "" && cmd.GroupSubjectId != oldLesson.GroupSubjectId {
+		_, err = l.subjectStore.GetGroupSubjectsById(cmd.GroupSubjectId)
+		if err != nil {
+			return nil, err
+		}
 		updateLesson.GroupSubjectId = &cmd.GroupSubjectId
 	}
 	return l.lessonStore.UpdateLesson(updateLesson)

@@ -2,7 +2,6 @@ package lessons
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"io/ioutil"
@@ -111,7 +110,6 @@ func (h *httpEndpoints) MakeUpdateLessonEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrLessonIdNotProvided))
 			return
 		}
-		cmd.Id = id
 		jsonData, err := ioutil.ReadAll(c.Request.Body)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
@@ -122,7 +120,7 @@ func (h *httpEndpoints) MakeUpdateLessonEndpoint() gin.HandlerFunc {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
 			return
 		}
-		fmt.Println(cmd)
+		cmd.Id = id
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
