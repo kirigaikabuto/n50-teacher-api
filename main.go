@@ -210,6 +210,7 @@ func run(c *cli.Context) error {
 		lessonGroup.GET("/groupSubjectId", lessonHttpEndpoints.MakeListLessonByGroupSubjectIdEndpoint())
 		lessonGroup.PUT("/", lessonHttpEndpoints.MakeUpdateLessonEndpoint())
 		lessonGroup.DELETE("/", lessonHttpEndpoints.MakeDeleteLessonEndpoint())
+		lessonGroup.PUT("/file", lessonHttpEndpoints.MakeUploadFileEndpoint())
 	}
 	log.Info().Msg("app is running on port:" + port)
 	server := &http.Server{

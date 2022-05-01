@@ -3,6 +3,8 @@ package lessons
 import (
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	"github.com/kirigaikabuto/n50-teacher-api/subjects"
+	"io/ioutil"
+	"os"
 )
 
 type LessonService interface {
@@ -11,6 +13,8 @@ type LessonService interface {
 	GetLessonById(cmd *GetLessonByIdCommand) (*Lesson, error)
 	UpdateLesson(cmd *UpdateLessonCommand) (*Lesson, error)
 	DeleteLesson(cmd *DeleteLessonCommand) error
+
+	UploadFile(cmd *UploadFileCommand) error
 }
 
 type lessonService struct {
@@ -84,4 +88,29 @@ func (l *lessonService) UpdateLesson(cmd *UpdateLessonCommand) (*Lesson, error) 
 
 func (l *lessonService) DeleteLesson(cmd *DeleteLessonCommand) error {
 	return l.lessonStore.DeleteLesson(cmd.Id)
+}
+
+func (l *lessonService) UploadFile(cmd *UploadFileCommand) error {
+	folderCreateDir := "./videos/"
+	err := os.Mkdir(folderCreateDir, 0700)
+	if err != nil {
+		return err
+	}
+	videoFolderName := "video_" + cmd.Name + "/"
+	videoFullPath := folderCreateDir + videoFolderName
+	err = os.Mkdir(videoFullPath, 0700)
+	if err != nil {
+		return err
+	}
+	hlsFolder := videoFullPath + "/hls/"
+	err = os.Mkdir(hlsFolder, 0700)
+	if err != nil {
+		return err
+	}
+	filePath := videoFullPath + cmd.Name + "." + cmd.Type
+	err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
+	if err != nil {
+		return err
+	}
+	return nil
 }

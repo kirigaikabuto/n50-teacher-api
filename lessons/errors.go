@@ -14,4 +14,5 @@ var (
 	ErrNoUserIdInToken           = com.NewMiddleError(errors.New("no user id in token"), 400, 705)
 	ErrNoUserTypeInToken         = com.NewMiddleError(errors.New("no user type in token"), 400, 706)
 	ErrGroupSubjectIdNotProvided = com.NewMiddleError(errors.New("group subject id is not provided"), 400, 707)
+	ErrFileIdNotProvided         = com.NewMiddleError(errors.New("file id is not provided"), 400, 708)
 )

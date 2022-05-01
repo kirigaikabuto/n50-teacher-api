@@ -1,11 +1,14 @@
 package lessons
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
+	"io"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 type HttpEndpoints interface {
@@ -14,6 +17,8 @@ type HttpEndpoints interface {
 	MakeUpdateLessonEndpoint() gin.HandlerFunc
 	MakeListLessonByGroupSubjectIdEndpoint() gin.HandlerFunc
 	MakeDeleteLessonEndpoint() gin.HandlerFunc
+
+	MakeUploadFileEndpoint() gin.HandlerFunc
 }
 
 type httpEndpoints struct {
@@ -190,6 +195,44 @@ func (h *httpEndpoints) MakeDeleteLessonEndpoint() gin.HandlerFunc {
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		respondJSON(c.Writer, http.StatusOK, resp)
+	}
+}
+
+func (h *httpEndpoints) MakeUploadFileEndpoint() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		cmd := &UploadFileCommand{}
+		fileId := context.Request.URL.Query().Get("id")
+		if fileId == "" {
+			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(ErrFileIdNotProvided))
+			return
+		}
+		cmd.Id = fileId
+		buf := bytes.NewBuffer(nil)
+		file, header, err := context.Request.FormFile("file")
+		if err != nil {
+			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		fileInfo := strings.Split(header.Filename, ".")
+		cmd.Name = fileInfo[0]
+		cmd.Type = fileInfo[1]
+		_, err = io.Copy(buf, file)
+		if err != nil {
+			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		err = file.Close()
+		if err != nil {
+			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		cmd.File = buf
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		respondJSON(context.Writer, http.StatusOK, resp)
 	}
 }
 
