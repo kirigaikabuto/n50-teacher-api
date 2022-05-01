@@ -101,7 +101,7 @@ func run(c *cli.Context) error {
 		Params:   postgresParams,
 	}
 	//applications
-	_, err := common.NewS3Uploader(
+	s3Uploader, err := common.NewS3Uploader(
 		s3endpoint,
 		s3accessKey,
 		s3secretKey,
@@ -149,7 +149,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	lessonService := lessons.NewLessonService(lessonsPostgreStore, subjectPostgreStore)
+	lessonService := lessons.NewLessonService(lessonsPostgreStore, subjectPostgreStore, s3Uploader)
 	lessonHttpEndpoints := lessons.NewLessonHttpEndpoints(setdata_common.NewCommandHandler(lessonService))
 
 	//create admin

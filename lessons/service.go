@@ -21,10 +21,11 @@ type LessonService interface {
 type lessonService struct {
 	lessonStore  LessonStore
 	subjectStore subjects.SubjectStore
+	s3Uploader   common.S3Uploader
 }
 
-func NewLessonService(l LessonStore, s subjects.SubjectStore) LessonService {
-	return &lessonService{lessonStore: l, subjectStore: s}
+func NewLessonService(l LessonStore, s subjects.SubjectStore, s3Uploader common.S3Uploader) LessonService {
+	return &lessonService{lessonStore: l, subjectStore: s, s3Uploader: s3Uploader}
 }
 
 func (l *lessonService) CreateLesson(cmd *CreateLessonCommand) (*Lesson, error) {
