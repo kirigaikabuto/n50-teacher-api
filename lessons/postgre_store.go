@@ -45,7 +45,7 @@ func NewLessonsPostgreStore(cfg common.PostgresConfig) (LessonStore, error) {
 func (l *lessonPostgreStore) CreateLesson(model *Lesson) (*Lesson, error) {
 	model.Id = uuid.New().String()
 	result, err := l.db.Exec("INSERT INTO lessons (id, name, description, video_file_url, document_file_url, group_subject_id, created_date) "+
-		"VALUES ($1, $2, $3, $4, $5, $6 current_date)",
+		"VALUES ($1, $2, $3, $4, $5, $6, current_date)",
 		model.Id, model.Name, model.Description, model.VideoFileUrl, model.DocumentFileUrl, model.GroupSubjectId,
 	)
 	if err != nil {
