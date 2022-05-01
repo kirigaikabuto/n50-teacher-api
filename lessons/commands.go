@@ -35,14 +35,14 @@ func (cmd *GetLessonByIdCommand) Exec(svc interface{}) (interface{}, error) {
 }
 
 type UpdateLessonCommand struct {
-	Id              string  `json:"-"`
-	Name            *string `json:"name"`
-	Description     *string `json:"description"`
-	VideoFileUrl    *string `json:"video_file_url"`
-	DocumentFileUrl *string `json:"document_file_url"`
-	GroupSubjectId  *string `json:"group_subject_id"`
-	CurrentUserType string  `json:"-"`
-	CurrentUserId   string  `json:"-"`
+	Id              string `json:"-"`
+	Name            string `json:"name"`
+	Description     string `json:"description"`
+	VideoFileUrl    string `json:"video_file_url"`
+	DocumentFileUrl string `json:"document_file_url"`
+	GroupSubjectId  string `json:"group_subject_id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
 }
 
 func (cmd *UpdateLessonCommand) Exec(svc interface{}) (interface{}, error) {

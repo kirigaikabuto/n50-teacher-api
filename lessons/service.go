@@ -18,8 +18,8 @@ type lessonService struct {
 	subjectStore subjects.SubjectStore
 }
 
-func NewLessonService(l LessonStore) LessonService {
-	return &lessonService{lessonStore: l}
+func NewLessonService(l LessonStore, s subjects.SubjectStore) LessonService {
+	return &lessonService{lessonStore: l, subjectStore: s}
 }
 
 func (l *lessonService) CreateLesson(cmd *CreateLessonCommand) (*Lesson, error) {
@@ -27,7 +27,7 @@ func (l *lessonService) CreateLesson(cmd *CreateLessonCommand) (*Lesson, error) 
 		return nil, ErrNoAccessPermissions
 	}
 	_, err := l.subjectStore.GetGroupSubjectsById(cmd.GroupSubjectId)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return l.lessonStore.CreateLesson(&Lesson{
@@ -55,6 +55,25 @@ func (l *lessonService) GetLessonById(cmd *GetLessonByIdCommand) (*Lesson, error
 
 func (l *lessonService) UpdateLesson(cmd *UpdateLessonCommand) (*Lesson, error) {
 	updateLesson := &LessonUpdate{}
+	oldLesson, err := l.lessonStore.GetLessonById(cmd.Id)
+	if err != nil {
+		return nil, err
+	}
+	if cmd.Name != "" && cmd.Name != oldLesson.Name {
+		updateLesson.Name = &cmd.Name
+	}
+	if cmd.Description != "" && cmd.Description != oldLesson.Description {
+		updateLesson.Description = &cmd.Description
+	}
+	if cmd.VideoFileUrl != "" && cmd.VideoFileUrl != oldLesson.VideoFileUrl {
+		updateLesson.VideoFileUrl = &cmd.VideoFileUrl
+	}
+	if cmd.DocumentFileUrl != "" && cmd.DocumentFileUrl != oldLesson.DocumentFileUrl {
+		updateLesson.DocumentFileUrl = &cmd.DocumentFileUrl
+	}
+	if cmd.GroupSubjectId != "" && cmd.GroupSubjectId != oldLesson.GroupSubjectId {
+		updateLesson.GroupSubjectId = &cmd.GroupSubjectId
+	}
 	return l.lessonStore.UpdateLesson(updateLesson)
 }
 

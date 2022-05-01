@@ -149,7 +149,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	lessonService := lessons.NewLessonService(lessonsPostgreStore)
+	lessonService := lessons.NewLessonService(lessonsPostgreStore, subjectPostgreStore)
 	lessonHttpEndpoints := lessons.NewLessonHttpEndpoints(setdata_common.NewCommandHandler(lessonService))
 
 	//create admin
