@@ -40,7 +40,8 @@ func (h *httpEndpoints) MakeLoginEndpoint() gin.HandlerFunc {
 			return
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		respondJSON(c.Writer, http.StatusOK, resp)
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "PUT, DELETE, GET, POST")
+		c.JSON(200, resp)
 	}
 }
 
