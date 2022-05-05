@@ -1,5 +1,7 @@
 package common
 
+import "net"
+
 var (
 	imageTypes = []string{
 		"image/gif",
@@ -86,4 +88,11 @@ func IsUserTypeExist(s string) bool {
 
 type Resp struct {
 	Objects interface{} `json:"objects"`
+}
+
+func GetOutboundIP() net.IP {
+	conn, _ := net.Dial("udp", "8.8.8.8:80")
+	defer conn.Close()
+	localAddr := conn.LocalAddr().(*net.UDPAddr)
+	return localAddr.IP
 }
