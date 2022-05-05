@@ -10,6 +10,8 @@ services:
       PGDATA: /pg-data
     ports:
       - "5433:5432"
+    volumes:
+      - ./full_data.sql:/docker-entrypoint-initdb.d/full_data.sql
   redis:
     image: "redis:alpine"
     command: redis-server
