@@ -1,0 +1,43 @@
+{
+  "db": {
+    "primary": {
+      "host": "192.168.0.10",
+      "port": 5433,
+      "name": "n50db",
+      "user": "setdatauser",
+      "pass": "123456789",
+      "param": "sslmode=disable"
+    }
+  },
+  "redis": {
+    "primary": {
+      "host": "192.168.0.10",
+      "port": "6379"
+    }
+  },
+  "s3": {
+    "primary": {
+      "s3endpoint": "https://s3.us-east-1.amazonaws.com",
+      "s3bucket": "emirfondcity",
+      "s3accessKey": "AKIASNFA4MWWUTEWFOGB",
+      "s3secretKey": "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",
+      "s3uploadedFilesBasePath": "https://emirfondcity.s3.us-east-1.amazonaws.com",
+      "s3region": "us-east-1"
+    }
+  },
+  "2gis": {
+    "primary": {
+      "api_key": "ruvers7799",
+      "city": "Алматы"
+    }
+  },
+  "user": {
+    "admin": {
+      "username": "admin",
+      "password": "admin",
+      "first_name": "admin",
+      "last_name": "admin",
+      "email": "tleugazy98@gmail.com"
+    }
+  }
+}
