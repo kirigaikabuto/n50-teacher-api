@@ -315,3 +315,16 @@ func (s *subjectStore) GetGroupSubjectByGroupId(id string) ([]GroupSubject, erro
 	}
 	return objects, nil
 }
+
+func (s *subjectStore) GetGroupSubjectByTeacherGroupIds(idTeacher string, idGroup string) (*GroupSubject, error) {
+	obj := &GroupSubject{}
+	err := s.db.QueryRow("select id, group_id, teacher_subject_id, created_date from group_subjects where teacher_subject_id = $1 and group_id = $2", idTeacher, idGroup).
+		Scan(&obj.Id, &obj.GroupId, &obj.TeacherSubjectId, &obj.CreatedDate,
+		)
+	if err == sql.ErrNoRows {
+		return nil, ErrGroupSubjectNotFound
+	} else if err != nil {
+		return nil, err
+	}
+	return obj, nil
+}

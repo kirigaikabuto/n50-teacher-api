@@ -16,12 +16,14 @@ type SubjectService interface {
 	GetTeacherSubjectById(cmd *GetTeacherSubjectByIdCommand) (*TeacherSubject, error)
 	GetTeacherSubjectsByTeacherId(cmd *GetTeacherSubjectsByTeacherIdCommand) ([]TeacherSubject, error)
 	GetTeacherSubjectsBySubjectId(cmd *GetTeacherSubjectsBySubjectIdCommand) ([]TeacherSubject, error)
+	GetTeacherSubjectByToken(cmd *GetTeacherSubjectsByTokenCommand) ([]TeacherSubject, error)
 
 	CreateGroupSubject(cmd *CreateGroupSubjectCommand) (*GroupSubject, error)
 	ListGroupSubjects(cmd *ListGroupSubjectsCommand) ([]GroupSubject, error)
 	GetGroupSubjectsById(cmd *GetGroupSubjectById) (*GroupSubject, error)
 	GetGroupSubjectByIdTeacherSub(cmd *GetGroupSubjectByIdTeacherSub) ([]GroupSubject, error)
 	GetGroupSubjectByGroupId(cmd *GetGroupSubjectByGroupId) ([]GroupSubject, error)
+	GetGroupSubjectByTeacherGroupIds(cmd *GetGroupSubjectByTeacherGroupIdsCommand) (*GroupSubject, error)
 }
 
 type subjectService struct {
@@ -163,4 +165,18 @@ func (s *subjectService) GetGroupSubjectByGroupId(cmd *GetGroupSubjectByGroupId)
 		return nil, ErrNoAccessPermissions
 	}
 	return s.subjectStore.GetGroupSubjectByGroupId(cmd.GroupId)
+}
+
+func (s *subjectService) GetGroupSubjectByTeacherGroupIds(cmd *GetGroupSubjectByTeacherGroupIdsCommand) (*GroupSubject, error) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
+		return nil, ErrNoAccessPermissions
+	}
+	return s.subjectStore.GetGroupSubjectByTeacherGroupIds(cmd.TeacherSubjectId, cmd.GroupId)
+}
+
+func (s *subjectService) GetTeacherSubjectByToken(cmd *GetTeacherSubjectsByTokenCommand) ([]TeacherSubject, error) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
+		return nil, ErrNoAccessPermissions
+	}
+	return s.subjectStore.GetTeacherSubjectsByTeacherId(cmd.CurrentUserId)
 }

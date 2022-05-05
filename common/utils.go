@@ -83,3 +83,7 @@ func IsUserTypeExist(s string) bool {
 	}
 	return false
 }
+
+type Resp struct {
+	Objects interface{} `json:"objects"`
+}

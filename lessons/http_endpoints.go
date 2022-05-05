@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/kirigaikabuto/n50-teacher-api/common"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
 	"io"
 	"io/ioutil"
@@ -163,7 +164,7 @@ func (h *httpEndpoints) MakeListLessonByGroupSubjectIdEndpoint() gin.HandlerFunc
 			return
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		respondJSON(c.Writer, http.StatusOK, resp)
+		respondJSON(c.Writer, http.StatusOK, common.Resp{Objects: resp})
 	}
 }
 

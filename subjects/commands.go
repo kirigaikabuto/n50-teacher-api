@@ -129,3 +129,23 @@ type GetGroupSubjectByGroupId struct {
 func (cmd *GetGroupSubjectByGroupId) Exec(svc interface{}) (interface{}, error) {
 	return svc.(SubjectService).GetGroupSubjectByGroupId(cmd)
 }
+
+type GetGroupSubjectByTeacherGroupIdsCommand struct {
+	GroupId          string `json:"group_id"`
+	TeacherSubjectId string `json:"teacher_subject_id"`
+	CurrentUserType  string `json:"-"`
+	CurrentUserId    string `json:"-"`
+}
+
+func (cmd *GetGroupSubjectByTeacherGroupIdsCommand) Exec(svc interface{}) (interface{}, error) {
+	return svc.(SubjectService).GetGroupSubjectByTeacherGroupIds(cmd)
+}
+
+type GetTeacherSubjectsByTokenCommand struct {
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
+}
+
+func (cmd *GetTeacherSubjectsByTokenCommand) Exec(svc interface{}) (interface{}, error) {
+	return svc.(SubjectService).GetTeacherSubjectByToken(cmd)
+}

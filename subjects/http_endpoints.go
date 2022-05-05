@@ -18,12 +18,14 @@ type HttpEndpoints interface {
 	MakeGetTeacherSubjectByIdEndpoint() gin.HandlerFunc
 	MakeGetTeacherSubjectsByTeacherIdEndpoint() gin.HandlerFunc
 	MakeGetTeacherSubjectsBySubjectIdEndpoint() gin.HandlerFunc
+	MakeGetTeacherSubjectsByTokenEndpoint() gin.HandlerFunc
 
 	MakeCreateGroupSubjectEndpoint() gin.HandlerFunc
 	MakeListGroupSubjectsEndpoint() gin.HandlerFunc
 	MakeGetGroupSubjectsByIdEndpoint() gin.HandlerFunc
 	MakeGetGroupSubjectByIdTeacherSubEndpoint() gin.HandlerFunc
 	MakeGetGroupSubjectByGroupIdEndpoint() gin.HandlerFunc
+	MakeGetGroupSubjectByTeacherGroupIdsEndpoint() gin.HandlerFunc
 }
 
 type httpEndpoints struct {
@@ -217,6 +219,10 @@ func (h *httpEndpoints) MakeGetTeacherSubjectByIdEndpoint() gin.HandlerFunc {
 	}
 }
 
+type Resp struct {
+	Objects interface{} `json:"objects"`
+}
+
 func (h *httpEndpoints) MakeGetTeacherSubjectsByTeacherIdEndpoint() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		cmd := &GetTeacherSubjectsByTeacherIdCommand{}
@@ -244,7 +250,7 @@ func (h *httpEndpoints) MakeGetTeacherSubjectsByTeacherIdEndpoint() gin.HandlerF
 			return
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		respondJSON(c.Writer, http.StatusOK, resp)
+		respondJSON(c.Writer, http.StatusOK, Resp{Objects: resp})
 	}
 }
 
@@ -276,6 +282,31 @@ func (h *httpEndpoints) MakeGetTeacherSubjectsBySubjectIdEndpoint() gin.HandlerF
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		respondJSON(c.Writer, http.StatusOK, resp)
+	}
+}
+
+func (h *httpEndpoints) MakeGetTeacherSubjectsByTokenEndpoint() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cmd := &GetTeacherSubjectsByTokenCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, Resp{Objects: resp})
 	}
 }
 
@@ -397,7 +428,7 @@ func (h *httpEndpoints) MakeGetGroupSubjectByIdTeacherSubEndpoint() gin.HandlerF
 			return
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		respondJSON(c.Writer, http.StatusOK, resp)
+		respondJSON(c.Writer, http.StatusOK, Resp{Objects: resp})
 	}
 }
 
@@ -422,6 +453,43 @@ func (h *httpEndpoints) MakeGetGroupSubjectByGroupIdEndpoint() gin.HandlerFunc {
 			return
 		}
 		cmd.GroupId = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
+	}
+}
+
+func (h *httpEndpoints) MakeGetGroupSubjectByTeacherGroupIdsEndpoint() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cmd := &GetGroupSubjectByTeacherGroupIdsCommand{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		teacherSubId := c.Request.URL.Query().Get("teacherSubId")
+		if teacherSubId == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrTeacherSubjectIdNotProvided))
+			return
+		}
+		groupId := c.Request.URL.Query().Get("groupId")
+		if teacherSubId == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
+			return
+		}
+		cmd.GroupId = groupId
+		cmd.TeacherSubjectId = teacherSubId
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))

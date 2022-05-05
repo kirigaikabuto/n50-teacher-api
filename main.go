@@ -190,6 +190,7 @@ func run(c *cli.Context) error {
 		teacherSubjectGroup.GET("/id", subjectHttpEndpoints.MakeGetTeacherSubjectByIdEndpoint())
 		teacherSubjectGroup.GET("/teacherId", subjectHttpEndpoints.MakeGetTeacherSubjectsByTeacherIdEndpoint())
 		teacherSubjectGroup.GET("/subjectId", subjectHttpEndpoints.MakeGetTeacherSubjectsBySubjectIdEndpoint())
+		teacherSubjectGroup.GET("/token", subjectHttpEndpoints.MakeGetTeacherSubjectsByTokenEndpoint())
 	}
 	groupSubjectGroup := r.Group("/groupSubject", authMdw.MakeMiddleware())
 	{
@@ -198,6 +199,7 @@ func run(c *cli.Context) error {
 		groupSubjectGroup.GET("/id", subjectHttpEndpoints.MakeGetGroupSubjectsByIdEndpoint())
 		groupSubjectGroup.GET("/teacherSubId", subjectHttpEndpoints.MakeGetGroupSubjectByIdTeacherSubEndpoint())
 		groupSubjectGroup.GET("/groupId", subjectHttpEndpoints.MakeGetGroupSubjectByGroupIdEndpoint())
+		groupSubjectGroup.GET("/ids", subjectHttpEndpoints.MakeGetGroupSubjectByTeacherGroupIdsEndpoint())
 	}
 	lessonGroup := r.Group("/lesson", authMdw.MakeMiddleware())
 	{
