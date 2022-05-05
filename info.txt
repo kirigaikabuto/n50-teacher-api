@@ -27,3 +27,6 @@ lessons:
 
 
 ffmpeg -i main.mp4 -c:a libmp3lame -b:a 128k -map 0:0 -f segment -segment_time 10 -segment_list ./hls/outputlist.m3u8 -segment_format mpegts ./hls/output%03d.ts
+
+docker build -t kirigaikabuto/n50-teacher-api:latest .
+docker-compose up --build
