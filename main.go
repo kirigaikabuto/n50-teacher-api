@@ -208,7 +208,7 @@ func run(c *cli.Context) error {
 	lessonGroup := r.Group("/lesson", authMdw.MakeMiddleware())
 	{
 		lessonGroup.POST("/", lessonHttpEndpoints.MakeCreateLessonEndpoint())
-		lessonGroup.GET("/", lessonHttpEndpoints.MakeGetLessonByIdEndpoint())
+		lessonGroup.GET("/id", lessonHttpEndpoints.MakeGetLessonByIdEndpoint())
 		lessonGroup.GET("/groupSubjectId", lessonHttpEndpoints.MakeListLessonByGroupSubjectIdEndpoint())
 		lessonGroup.PUT("/", lessonHttpEndpoints.MakeUpdateLessonEndpoint())
 		lessonGroup.DELETE("/", lessonHttpEndpoints.MakeDeleteLessonEndpoint())
