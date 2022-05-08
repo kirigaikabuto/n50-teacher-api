@@ -14,8 +14,7 @@ type LessonService interface {
 	GetLessonById(cmd *GetLessonByIdCommand) (*Lesson, error)
 	UpdateLesson(cmd *UpdateLessonCommand) (*Lesson, error)
 	DeleteLesson(cmd *DeleteLessonCommand) error
-
-	UploadFile(cmd *UploadFileCommand) error
+	UploadFile(cmd *UploadFileCommand) (*UploadFileResponse, error)
 }
 
 type lessonService struct {
@@ -92,27 +91,39 @@ func (l *lessonService) DeleteLesson(cmd *DeleteLessonCommand) error {
 	return l.lessonStore.DeleteLesson(cmd.Id)
 }
 
-func (l *lessonService) UploadFile(cmd *UploadFileCommand) error {
+func (l *lessonService) UploadFile(cmd *UploadFileCommand) (*UploadFileResponse, error) {
 	folderCreateDir := "./videos/"
 	err := os.Mkdir(folderCreateDir, 0700)
-	if err != nil && !strings.Contains(err.Error(), "that file already exists.") {
-		return err
+	if err != nil && !strings.Contains(err.Error(), "that file already exists.") && !strings.Contains(err.Error(), "mkdir ./videos/: file exists") {
+		return nil, err
 	}
 	videoFolderName := "video_" + cmd.Id + "/"
 	videoFullPath := folderCreateDir + videoFolderName
 	err = os.Mkdir(videoFullPath, 0700)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	hlsFolder := videoFullPath + "/hls/"
 	err = os.Mkdir(hlsFolder, 0700)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	filePath := videoFullPath + cmd.Name + "." + cmd.Type
 	err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
+
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return nil
+	currentFilePath := "http://localhost:5000/static" + filePath[1:]
+	_, err = l.lessonStore.UpdateLesson(&LessonUpdate{
+		Id:           cmd.Id,
+		VideoFileUrl: &currentFilePath,
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &UploadFileResponse{
+		LessonId: cmd.Id,
+		FileUrl:  currentFilePath,
+	}, nil
 }

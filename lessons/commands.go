@@ -70,5 +70,10 @@ type UploadFileCommand struct {
 }
 
 func (cmd *UploadFileCommand) Exec(svc interface{}) (interface{}, error) {
-	return nil, svc.(LessonService).UploadFile(cmd)
+	return svc.(LessonService).UploadFile(cmd)
+}
+
+type UploadFileResponse struct {
+	LessonId string `json:"lesson_id"`
+	FileUrl  string `json:"file_url"`
 }

@@ -159,6 +159,10 @@ func run(c *cli.Context) error {
 	})
 
 	r := gin.Default()
+	staticGroup := r.Group("/static")
+	{
+		staticGroup.StaticFS("/videos", gin.Dir("./videos/", true))
+	}
 	authGroup := r.Group("/auth")
 	{
 		authGroup.POST("/login", usersHttpEndpoints.MakeLoginEndpoint())

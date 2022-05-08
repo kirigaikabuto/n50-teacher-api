@@ -18,7 +18,6 @@ type HttpEndpoints interface {
 	MakeUpdateLessonEndpoint() gin.HandlerFunc
 	MakeListLessonByGroupSubjectIdEndpoint() gin.HandlerFunc
 	MakeDeleteLessonEndpoint() gin.HandlerFunc
-
 	MakeUploadFileEndpoint() gin.HandlerFunc
 }
 
