@@ -92,36 +92,65 @@ func (l *lessonService) DeleteLesson(cmd *DeleteLessonCommand) error {
 }
 
 func (l *lessonService) UploadFile(cmd *UploadFileCommand) (*UploadFileResponse, error) {
-	folderCreateDir := "./videos/"
-	err := os.Mkdir(folderCreateDir, 0700)
-	if err != nil && !strings.Contains(err.Error(), "that file already exists.") && !strings.Contains(err.Error(), "mkdir ./videos/: file exists") {
-		return nil, err
+	currentFilePath := ""
+	filePath := ""
+	if cmd.Type == "mp4" {
+		folderCreateDir := "./videos/"
+		err := os.Mkdir(folderCreateDir, 0700)
+		if err != nil && !strings.Contains(err.Error(), "that file already exists.") && !strings.Contains(err.Error(), "mkdir ./videos/: file exists") {
+			return nil, err
+		}
+		videoFolderName := "video_" + cmd.Id + "/"
+		videoFullPath := folderCreateDir + videoFolderName
+		err = os.Mkdir(videoFullPath, 0700)
+		if err != nil {
+			return nil, err
+		}
+		hlsFolder := videoFullPath + "/hls/"
+		err = os.Mkdir(hlsFolder, 0700)
+		if err != nil {
+			return nil, err
+		}
+		filePath = videoFullPath + cmd.Name + "." + cmd.Type
+		err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
+		if err != nil {
+			return nil, err
+		}
+		currentFilePath = "http://localhost:5000/static" + filePath[1:]
+		_, err = l.lessonStore.UpdateLesson(&LessonUpdate{
+			Id:           cmd.Id,
+			VideoFileUrl: &currentFilePath,
+		})
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		folderCreateDir := "./documents/"
+		err := os.Mkdir(folderCreateDir, 0700)
+		if err != nil && !strings.Contains(err.Error(), "that file already exists.") && !strings.Contains(err.Error(), "mkdir ./documents/: file exists") {
+			return nil, err
+		}
+		documentFolderName := "document_" + cmd.Id + "/"
+		documentFullPath := folderCreateDir + documentFolderName
+		err = os.Mkdir(documentFullPath, 0700)
+		if err != nil {
+			return nil, err
+		}
+		filePath = documentFullPath + cmd.Name + "." + cmd.Type
+		err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
+		if err != nil {
+			return nil, err
+		}
+		currentFilePath = "http://localhost:5000/static" + filePath[1:]
+		_, err = l.lessonStore.UpdateLesson(&LessonUpdate{
+			Id:              cmd.Id,
+			DocumentFileUrl: &currentFilePath,
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
-	videoFolderName := "video_" + cmd.Id + "/"
-	videoFullPath := folderCreateDir + videoFolderName
-	err = os.Mkdir(videoFullPath, 0700)
-	if err != nil {
-		return nil, err
-	}
-	hlsFolder := videoFullPath + "/hls/"
-	err = os.Mkdir(hlsFolder, 0700)
-	if err != nil {
-		return nil, err
-	}
-	filePath := videoFullPath + cmd.Name + "." + cmd.Type
-	err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
 
-	if err != nil {
-		return nil, err
-	}
-	currentFilePath := "http://localhost:5000/static" + filePath[1:]
-	_, err = l.lessonStore.UpdateLesson(&LessonUpdate{
-		Id:           cmd.Id,
-		VideoFileUrl: &currentFilePath,
-	})
-	if err != nil {
-		return nil, err
-	}
 	return &UploadFileResponse{
 		LessonId: cmd.Id,
 		FileUrl:  currentFilePath,
