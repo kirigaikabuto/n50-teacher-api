@@ -30,3 +30,54 @@ ffmpeg -i main.mp4 -c:a libmp3lame -b:a 128k -map 0:0 -f segment -segment_time 1
 
 docker build -t kirigaikabuto/n50-teacher-api:latest .
 docker-compose up --build
+
+
+
+[1]Авторизоваться как админ
+auth->login
+{
+    "username":"admin",
+    "password":"admin"
+}
+[2] берешь значение из поля access_token и кладешь его в n50->variables->token(initial_value, current_value)
+[3]  auth->register
+
+{
+    "username":"student1",
+    "password":"student1",
+    "type":"student",
+    "email":"student1@gmail.com"
+}
+
+и после создания пользователя не забудь скопировать его id
+[4] groups->list
+посмотри все группы которые у тебя есть и выбери одну и так же скопируй id
+[5] groups->create user groups
+{
+    "user_id":"218efa1c-b6ee-46a1-9a55-9dea8b0e23d9", //[3]
+    "group_id":"fed0aff4-00fb-4006-b4b5-4bc3ec9814e0" //[4]
+}
+[6]Авторизоваться как студент
+auth->login
+{
+    "username":"student1",
+    "password":"studen1"
+}
+[7] проверить приналжелит ли он какой либо группе
+
+groups->get user group by token
+
+примерный ответ
+[
+    {
+        "id": "77982d2a-30ba-482b-8ee1-28ab441f2040",
+        "user_id": "218efa1c-b6ee-46a1-9a55-9dea8b0e23d9",
+        "group_id": "fed0aff4-00fb-4006-b4b5-4bc3ec9814e0",
+        "created_date": "2022-05-11T00:00:00Z"
+    }
+]
+
+[8] затем берешь значение group_id и вытаскиваешь информацию об этой группе
+groups-> get by id
+
+{{host}}/group/id?id=[group_id]

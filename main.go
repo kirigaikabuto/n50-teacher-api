@@ -180,6 +180,7 @@ func run(c *cli.Context) error {
 		userGroupGroups.GET("/groupId", groupHttpEndpoints.MakeGetUserGroupByGroupIdEndpoint())
 		userGroupGroups.GET("/userId", groupHttpEndpoints.MakeGetUserGroupByUserIdEndpoint())
 		userGroupGroups.DELETE("/", groupHttpEndpoints.MakeDeleteUserGroupByIdEndpoint())
+		userGroupGroups.GET("/token", groupHttpEndpoints.MakeGetUserGroupByToken())
 	}
 	subjectsGroups := r.Group("/subjects", authMdw.MakeMiddleware())
 	{
