@@ -12,6 +12,7 @@ type HttpEndpoints interface {
 	MakeCreateSubjectEndpoint() gin.HandlerFunc
 	MakeListSubjectsEndpoint() gin.HandlerFunc
 	MakeGetSubjectByIdEndpoint() gin.HandlerFunc
+	MakeGetSubjectsByGroupId() gin.HandlerFunc
 
 	MakeCreateTeacherSubjectEndpoint() gin.HandlerFunc
 	MakeListTeacherSubjectsEndpoint() gin.HandlerFunc
@@ -118,6 +119,37 @@ func (h *httpEndpoints) MakeGetSubjectByIdEndpoint() gin.HandlerFunc {
 			return
 		}
 		cmd.Id = id
+		resp, err := h.ch.ExecCommand(cmd)
+		if err != nil {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
+			return
+		}
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		respondJSON(c.Writer, http.StatusOK, resp)
+	}
+}
+
+func (h *httpEndpoints) MakeGetSubjectsByGroupId() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		cmd := &GetSubjectsByGroupId{}
+		currentUserId, ok := c.Get("user_id")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserIdInToken))
+			return
+		}
+		currentUserType, ok := c.Get("user_type")
+		if !ok {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrNoUserTypeInToken))
+			return
+		}
+		cmd.CurrentUserId = currentUserId.(string)
+		cmd.CurrentUserType = currentUserType.(string)
+		id := c.Request.URL.Query().Get("group_id")
+		if id == "" {
+			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupIdNotProvided))
+			return
+		}
+		cmd.GroupId = id
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))

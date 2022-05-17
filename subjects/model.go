@@ -20,3 +20,9 @@ type GroupSubject struct {
 	TeacherSubjectId string `json:"teacher_subject_id"`
 	CreatedDate      string `json:"created_date"`
 }
+
+type SubjectFullInfo struct {
+	Subject        Subject `json:"subject"`
+	TeacherSubject TeacherSubject `json:"teacher_subject"`
+	GroupSubject   GroupSubject `json:"group_subject"`
+}

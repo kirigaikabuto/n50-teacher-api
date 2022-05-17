@@ -61,7 +61,7 @@ auth->login
 auth->login
 {
     "username":"student1",
-    "password":"studen1"
+    "password":"student1"
 }
 [7] проверить приналжелит ли он какой либо группе
 

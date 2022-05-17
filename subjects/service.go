@@ -10,6 +10,7 @@ type SubjectService interface {
 	CreateSubject(cmd *CreateSubjectCommand) (*Subject, error)
 	ListSubjects(cmd *ListSubjectsCommand) ([]Subject, error)
 	GetSubjectById(cmd *GetSubjectByIdCommand) (*Subject, error)
+	GetSubjectsByGroupId(cmd *GetSubjectsByGroupId) ([]SubjectFullInfo, error)
 
 	CreateTeacherSubject(cmd *CreateTeacherSubjectCommand) (*TeacherSubject, error)
 	ListTeacherSubjects(cmd *ListTeacherSubjectsCommand) ([]TeacherSubject, error)
@@ -63,6 +64,42 @@ func (s *subjectService) GetSubjectById(cmd *GetSubjectByIdCommand) (*Subject, e
 		return nil, ErrNoAccessPermissions
 	}
 	return s.subjectStore.GetSubjectById(cmd.Id)
+}
+
+func (s *subjectService) GetSubjectsByGroupId(cmd *GetSubjectsByGroupId) ([]SubjectFullInfo, error) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Student.ToString()}) {
+		return nil, ErrNoAccessPermissions
+	}
+	_, err := s.groupStore.GetGroupById(cmd.GroupId)
+	if err != nil {
+		return nil, err
+	}
+	groupSubjects, err := s.subjectStore.GetGroupSubjectByGroupId(cmd.GroupId)
+	if err != nil {
+		return nil, err
+	}
+	resp := []SubjectFullInfo{}
+	for _, v := range groupSubjects {
+		teacherSub, err := s.subjectStore.GetTeacherSubjectById(v.TeacherSubjectId)
+		if err != nil {
+			return nil, err
+		}
+		sub, err := s.subjectStore.GetSubjectById(teacherSub.SubjectId)
+		if err != nil {
+			return nil, err
+		}
+		groupSubject, err := s.subjectStore.GetGroupSubjectByTeacherGroupIds(teacherSub.Id, cmd.GroupId)
+		if err != nil {
+			return nil, err
+		}
+		temp := SubjectFullInfo{
+			Subject:        *sub,
+			TeacherSubject: *teacherSub,
+			GroupSubject:   *groupSubject,
+		}
+		resp = append(resp, temp)
+	}
+	return resp, nil
 }
 
 func (s *subjectService) CreateTeacherSubject(cmd *CreateTeacherSubjectCommand) (*TeacherSubject, error) {

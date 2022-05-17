@@ -110,8 +110,8 @@ func run(c *cli.Context) error {
 		return err
 	}
 	authTokenStore, err := auth.NewTokenStore(auth.RedisConfig{
-		Host: redisHost,
-		Port: redisPort,
+		Host:     redisHost,
+		Port:     redisPort,
 		Password: redisPassword,
 	})
 	if err != nil {
@@ -190,6 +190,7 @@ func run(c *cli.Context) error {
 		subjectsGroups.POST("/", subjectHttpEndpoints.MakeCreateSubjectEndpoint())
 		subjectsGroups.GET("/id", subjectHttpEndpoints.MakeGetSubjectByIdEndpoint())
 		subjectsGroups.GET("/", subjectHttpEndpoints.MakeListSubjectsEndpoint())
+		subjectsGroups.GET("/groupId", subjectHttpEndpoints.MakeGetSubjectsByGroupId())
 	}
 	teacherSubjectGroup := r.Group("/teacherSubject", authMdw.MakeMiddleware())
 	{

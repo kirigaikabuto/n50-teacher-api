@@ -30,6 +30,16 @@ func (cmd *GetSubjectByIdCommand) Exec(svc interface{}) (interface{}, error) {
 	return svc.(SubjectService).GetSubjectById(cmd)
 }
 
+type GetSubjectsByGroupId struct {
+	GroupId         string `json:"group_id"`
+	CurrentUserType string `json:"-"`
+	CurrentUserId   string `json:"-"`
+}
+
+func (cmd *GetSubjectsByGroupId) Exec(svc interface{}) (interface{}, error) {
+	return svc.(SubjectService).GetSubjectsByGroupId(cmd)
+}
+
 type CreateTeacherSubjectCommand struct {
 	TeacherId       string `json:"teacher_id"`
 	SubjectId       string `json:"subject_id"`
