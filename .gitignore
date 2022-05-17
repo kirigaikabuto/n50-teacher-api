@@ -3,3 +3,6 @@ n50-teacher-api.exe
 n50-teacher-api
 videos
 documents
+.env
+.docker_build/
+bin/
