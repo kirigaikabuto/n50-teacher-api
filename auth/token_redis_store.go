@@ -21,7 +21,9 @@ type tokenStore struct {
 
 func NewTokenStore(config RedisConfig) (TokenStore, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr: config.Host + ":" + config.Port,
+		Addr:     config.Host + ":" + config.Port,
+		Password: config.Password,
+		DB:       0,
 	})
 	_, err := client.Ping().Result()
 	if err != nil {

@@ -40,6 +40,7 @@ var (
 	port                    = "5000"
 	redisHost               = ""
 	redisPort               = ""
+	redisPassword           = ""
 	adminUsername           = ""
 	adminPassword           = ""
 	adminEmail              = ""
@@ -80,6 +81,7 @@ func parseEnvFile() {
 	s3region = viper.GetString("s3.primary.s3region")
 	redisHost = viper.GetString("redis.primary.host")
 	redisPort = viper.GetString("redis.primary.port")
+	redisPassword = viper.GetString("redis.primary.password")
 	adminUsername = viper.GetString("user.admin.username")
 	adminPassword = viper.GetString("user.admin.password")
 	adminEmail = viper.GetString("user.admin.email")
@@ -110,6 +112,7 @@ func run(c *cli.Context) error {
 	authTokenStore, err := auth.NewTokenStore(auth.RedisConfig{
 		Host: redisHost,
 		Port: redisPort,
+		Password: redisPassword,
 	})
 	if err != nil {
 		return err

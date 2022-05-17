@@ -1,0 +1,38 @@
+{
+  "db": {
+    "primary": {
+      "host": "https://ec2-52-212-228-71.eu-west-1.compute.amazonaws.com",
+      "port": 5432,
+      "name": "d9b8gjuf949ebm",
+      "user": "xbjlijbxvdbvxj",
+      "pass": "b5cdb47a4e69ae6bd01479308fe0d95be36c70d20af6ff91814570a00d444bf5",
+      "param": "sslmode=disable"
+    }
+  },
+  "redis": {
+    "primary": {
+      "host": "redis://admin:i77GPf#%@redis-11056.c77.eu-west-1-1.ec2.cloud.redislabs.com",
+      "port": "11056",
+      "password": "i77GPf#%"
+    }
+  },
+  "s3": {
+    "primary": {
+      "s3endpoint": "https://s3.us-east-1.amazonaws.com",
+      "s3bucket": "emirfondcity",
+      "s3accessKey": "AKIASNFA4MWWUTEWFOGB",
+      "s3secretKey": "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",
+      "s3uploadedFilesBasePath": "https://emirfondcity.s3.us-east-1.amazonaws.com",
+      "s3region": "us-east-1"
+    }
+  },
+  "user": {
+    "admin": {
+      "username": "admin",
+      "password": "admin",
+      "first_name": "admin",
+      "last_name": "admin",
+      "email": "tleugazy98@gmail.com"
+    }
+  }
+}
