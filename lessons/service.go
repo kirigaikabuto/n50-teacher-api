@@ -45,14 +45,14 @@ func (l *lessonService) CreateLesson(cmd *CreateLessonCommand) (*Lesson, error) 
 }
 
 func (l *lessonService) ListLessonByGroupSubjectId(cmd *ListLessonByGroupSubjectIdCommand) ([]Lesson, error) {
-	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Student.ToString(), common.Teacher.ToString(), common.Admin.ToString()}) {
 		return nil, ErrNoAccessPermissions
 	}
 	return l.lessonStore.ListLessonByGroupSubjectId(cmd.GroupSubjectId)
 }
 
 func (l *lessonService) GetLessonById(cmd *GetLessonByIdCommand) (*Lesson, error) {
-	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Student.ToString(),common.Teacher.ToString(), common.Admin.ToString()}) {
 		return nil, ErrNoAccessPermissions
 	}
 	return l.lessonStore.GetLessonById(cmd.Id)
