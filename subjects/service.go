@@ -161,7 +161,7 @@ func (s *subjectService) GetGroupSubjectByIdTeacherSub(cmd *GetGroupSubjectByIdT
 }
 
 func (s *subjectService) GetGroupSubjectByGroupId(cmd *GetGroupSubjectByGroupId) ([]GroupSubject, error) {
-	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Teacher.ToString(), common.Admin.ToString()}) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Student.ToString(), common.Teacher.ToString(), common.Admin.ToString()}) {
 		return nil, ErrNoAccessPermissions
 	}
 	return s.subjectStore.GetGroupSubjectByGroupId(cmd.GroupId)
