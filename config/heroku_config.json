@@ -1,19 +1,19 @@
 {
   "db": {
     "primary": {
-      "host": "https://ec2-52-212-228-71.eu-west-1.compute.amazonaws.com",
+      "host": "ec2-52-212-228-71.eu-west-1.compute.amazonaws.com",
       "port": 5432,
       "name": "d9b8gjuf949ebm",
       "user": "xbjlijbxvdbvxj",
       "pass": "b5cdb47a4e69ae6bd01479308fe0d95be36c70d20af6ff91814570a00d444bf5",
-      "param": "sslmode=disable"
+      "param": ""
     }
   },
   "redis": {
     "primary": {
-      "host": "redis://admin:i77GPf#%@redis-11056.c77.eu-west-1-1.ec2.cloud.redislabs.com",
+      "host": "redis-11056.c77.eu-west-1-1.ec2.cloud.redislabs.com",
       "port": "11056",
-      "password": "i77GPf#%"
+      "password": "n19XNJm4XpnkMTfFffnN2QWS0Fpdjp4k"
     }
   },
   "s3": {
