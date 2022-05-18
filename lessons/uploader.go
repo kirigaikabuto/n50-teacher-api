@@ -60,5 +60,5 @@ func (c *googleUploader) UploadFile(file multipart.File, object string, key stri
 	if err := wc.Close(); err != nil {
 		return nil, err
 	}
-	return &UploadFileResp{FileUrl: "https://storage.cloud.google.com/" + c.bucketName + "/" + fileUploadPath}, nil
+	return &UploadFileResp{FileUrl: "https://storage.googleapis.com/" + c.bucketName + "/" + fileUploadPath}, nil
 }
