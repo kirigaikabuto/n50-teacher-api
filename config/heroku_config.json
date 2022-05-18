@@ -16,14 +16,12 @@
       "password": "n19XNJm4XpnkMTfFffnN2QWS0Fpdjp4k"
     }
   },
-  "s3": {
+  "google_storage": {
     "primary": {
-      "s3endpoint": "https://s3.us-east-1.amazonaws.com",
-      "s3bucket": "emirfondcity",
-      "s3accessKey": "AKIASNFA4MWWUTEWFOGB",
-      "s3secretKey": "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",
-      "s3uploadedFilesBasePath": "https://emirfondcity.s3.us-east-1.amazonaws.com",
-      "s3region": "us-east-1"
+      "google_application_credentials": "silent-turbine-304510-80aff7f8c7a3.json",
+      "bucket_name": "silent-turbine-304510.appspot.com",
+      "project_id": "silent-turbine-304510",
+      "upload_path": "n50-files/"
     }
   },
   "user": {

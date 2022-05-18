@@ -25,12 +25,10 @@ var (
 	configName              = "main"
 	configPath              = "/config/"
 	version                 = "0.0.1"
-	s3endpoint              = ""
-	s3bucket                = ""
-	s3accessKey             = ""
-	s3secretKey             = ""
-	s3uploadedFilesBasePath = ""
-	s3region                = ""
+	googleStorageCred       = ""
+	googleStorageProjectId  = ""
+	googleStorageBucketName = ""
+	googleStorageUploadPath = ""
 	postgresUser            = ""
 	postgresPassword        = ""
 	postgresDatabaseName    = ""
@@ -73,12 +71,10 @@ func parseEnvFile() {
 	postgresParams = viper.GetString("db.primary.param")
 	postgresPort = viper.GetInt("db.primary.port")
 	postgresHost = viper.GetString("db.primary.host")
-	s3endpoint = viper.GetString("s3.primary.s3endpoint")
-	s3bucket = viper.GetString("s3.primary.s3bucket")
-	s3accessKey = viper.GetString("s3.primary.s3accessKey")
-	s3secretKey = viper.GetString("s3.primary.s3secretKey")
-	s3uploadedFilesBasePath = viper.GetString("s3.primary.s3uploadedFilesBasePath")
-	s3region = viper.GetString("s3.primary.s3region")
+	googleStorageCred = viper.GetString("google_storage.primary.google_application_credentials")
+	googleStorageBucketName = viper.GetString("google_storage.primary.bucket_name")
+	googleStorageProjectId = viper.GetString("google_storage.primary.project_id")
+	googleStorageUploadPath = viper.GetString("google_storage.primary.upload_path")
 	redisHost = viper.GetString("redis.primary.host")
 	redisPort = viper.GetString("redis.primary.port")
 	redisPassword = viper.GetString("redis.primary.password")
@@ -99,16 +95,12 @@ func run(c *cli.Context) error {
 		Params:   postgresParams,
 	}
 	//applications
-	s3Uploader, err := common.NewS3Uploader(
-		s3endpoint,
-		s3accessKey,
-		s3secretKey,
-		s3bucket,
-		s3uploadedFilesBasePath,
-		s3region)
-	if err != nil {
-		return err
-	}
+	googleStorage := lessons.NewGoogleUploader(lessons.GoogleUploaderConfig{
+		GoogleAppCred: googleStorageCred,
+		BucketName:    googleStorageBucketName,
+		ProjectId:     googleStorageProjectId,
+		UploadPath:    googleStorageUploadPath,
+	})
 	authTokenStore, err := auth.NewTokenStore(auth.RedisConfig{
 		Host:     redisHost,
 		Port:     redisPort,
@@ -148,7 +140,7 @@ func run(c *cli.Context) error {
 	if err != nil {
 		return err
 	}
-	lessonService := lessons.NewLessonService(lessonsPostgreStore, subjectPostgreStore, s3Uploader)
+	lessonService := lessons.NewLessonService(lessonsPostgreStore, subjectPostgreStore, googleStorage)
 	lessonHttpEndpoints := lessons.NewLessonHttpEndpoints(setdata_common.NewCommandHandler(lessonService))
 
 	//create admin

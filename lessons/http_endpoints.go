@@ -1,15 +1,12 @@
 package lessons
 
 import (
-	"bytes"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	setdata_common "github.com/kirigaikabuto/setdata-common"
-	"io"
 	"io/ioutil"
 	"net/http"
-	"strings"
 )
 
 type HttpEndpoints interface {
@@ -199,40 +196,26 @@ func (h *httpEndpoints) MakeDeleteLessonEndpoint() gin.HandlerFunc {
 }
 
 func (h *httpEndpoints) MakeUploadFileEndpoint() gin.HandlerFunc {
-	return func(context *gin.Context) {
+	return func(c *gin.Context) {
 		cmd := &UploadFileCommand{}
-		fileId := context.Request.URL.Query().Get("id")
+		fileId := c.Request.URL.Query().Get("id")
 		if fileId == "" {
-			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(ErrFileIdNotProvided))
+			respondJSON(c.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(ErrFileIdNotProvided))
 			return
 		}
 		cmd.Id = fileId
-		buf := bytes.NewBuffer(nil)
-		file, header, err := context.Request.FormFile("file")
+		f, err := c.FormFile("file_input")
 		if err != nil {
-			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
+			respondJSON(c.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
 			return
 		}
-		fileInfo := strings.Split(header.Filename, ".")
-		cmd.Name = fileInfo[0]
-		cmd.Type = fileInfo[1]
-		_, err = io.Copy(buf, file)
-		if err != nil {
-			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
-			return
-		}
-		err = file.Close()
-		if err != nil {
-			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
-			return
-		}
-		cmd.File = buf
+		cmd.File = f
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
-			respondJSON(context.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
+			respondJSON(c.Writer, http.StatusBadRequest, setdata_common.ErrToHttpResponse(err))
 			return
 		}
-		respondJSON(context.Writer, http.StatusOK, resp)
+		respondJSON(c.Writer, http.StatusOK, resp)
 	}
 }
 

@@ -3,8 +3,6 @@ package lessons
 import (
 	"github.com/kirigaikabuto/n50-teacher-api/common"
 	"github.com/kirigaikabuto/n50-teacher-api/subjects"
-	"io/ioutil"
-	"os"
 	"strings"
 )
 
@@ -18,13 +16,13 @@ type LessonService interface {
 }
 
 type lessonService struct {
-	lessonStore  LessonStore
-	subjectStore subjects.SubjectStore
-	s3Uploader   common.S3Uploader
+	lessonStore    LessonStore
+	subjectStore   subjects.SubjectStore
+	googleUploader GoogleUploader
 }
 
-func NewLessonService(l LessonStore, s subjects.SubjectStore, s3Uploader common.S3Uploader) LessonService {
-	return &lessonService{lessonStore: l, subjectStore: s, s3Uploader: s3Uploader}
+func NewLessonService(l LessonStore, s subjects.SubjectStore, gUploader GoogleUploader) LessonService {
+	return &lessonService{lessonStore: l, subjectStore: s, googleUploader: gUploader}
 }
 
 func (l *lessonService) CreateLesson(cmd *CreateLessonCommand) (*Lesson, error) {
@@ -52,7 +50,7 @@ func (l *lessonService) ListLessonByGroupSubjectId(cmd *ListLessonByGroupSubject
 }
 
 func (l *lessonService) GetLessonById(cmd *GetLessonByIdCommand) (*Lesson, error) {
-	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Student.ToString(),common.Teacher.ToString(), common.Admin.ToString()}) {
+	if !common.IsAvailableResource(cmd.CurrentUserType, []string{common.Student.ToString(), common.Teacher.ToString(), common.Admin.ToString()}) {
 		return nil, ErrNoAccessPermissions
 	}
 	return l.lessonStore.GetLessonById(cmd.Id)
@@ -92,67 +90,38 @@ func (l *lessonService) DeleteLesson(cmd *DeleteLessonCommand) error {
 }
 
 func (l *lessonService) UploadFile(cmd *UploadFileCommand) (*UploadFileResponse, error) {
-	currentFilePath := ""
-	filePath := ""
-	if cmd.Type == "mp4" {
-		folderCreateDir := "./videos/"
-		err := os.Mkdir(folderCreateDir, 0700)
-		if err != nil && !strings.Contains(err.Error(), "that file already exists.") && !strings.Contains(err.Error(), "mkdir ./videos/: file exists") {
-			return nil, err
-		}
-		videoFolderName := "video_" + cmd.Id + "/"
-		videoFullPath := folderCreateDir + videoFolderName
-		err = os.Mkdir(videoFullPath, 0700)
-		if err != nil {
-			return nil, err
-		}
-		hlsFolder := videoFullPath + "/hls/"
-		err = os.Mkdir(hlsFolder, 0700)
-		if err != nil {
-			return nil, err
-		}
-		filePath = videoFullPath + cmd.Name + "." + cmd.Type
-		err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
-		if err != nil {
-			return nil, err
-		}
-		currentFilePath = "http://localhost:5000/static" + filePath[1:]
+	_, err := l.lessonStore.GetLessonById(cmd.Id)
+	if err != nil {
+		return nil, err
+	}
+	blobFile, err := cmd.File.Open()
+	if err != nil {
+		return nil, err
+	}
+	resp, err := l.googleUploader.UploadFile(blobFile, cmd.File.Filename, cmd.Id)
+	if err != nil {
+		return nil, err
+	}
+	fileName := strings.Split(cmd.File.Filename, ".")
+	if fileName[1] == "mp4" {
 		_, err = l.lessonStore.UpdateLesson(&LessonUpdate{
 			Id:           cmd.Id,
-			VideoFileUrl: &currentFilePath,
+			VideoFileUrl: &resp.FileUrl,
 		})
 		if err != nil {
 			return nil, err
 		}
 	} else {
-		folderCreateDir := "./documents/"
-		err := os.Mkdir(folderCreateDir, 0700)
-		if err != nil && !strings.Contains(err.Error(), "that file already exists.") && !strings.Contains(err.Error(), "mkdir ./documents/: file exists") {
-			return nil, err
-		}
-		documentFolderName := "document_" + cmd.Id + "/"
-		documentFullPath := folderCreateDir + documentFolderName
-		err = os.Mkdir(documentFullPath, 0700)
-		if err != nil {
-			return nil, err
-		}
-		filePath = documentFullPath + cmd.Name + "." + cmd.Type
-		err = ioutil.WriteFile(filePath, cmd.File.Bytes(), 0700)
-		if err != nil {
-			return nil, err
-		}
-		currentFilePath = "http://localhost:5000/static" + filePath[1:]
 		_, err = l.lessonStore.UpdateLesson(&LessonUpdate{
 			Id:              cmd.Id,
-			DocumentFileUrl: &currentFilePath,
+			DocumentFileUrl: &resp.FileUrl,
 		})
 		if err != nil {
 			return nil, err
 		}
 	}
-
 	return &UploadFileResponse{
 		LessonId: cmd.Id,
-		FileUrl:  currentFilePath,
+		FileUrl:  resp.FileUrl,
 	}, nil
 }
