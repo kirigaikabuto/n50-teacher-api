@@ -149,6 +149,8 @@ func (h *httpEndpoints) MakeListLessonByGroupSubjectIdEndpoint() gin.HandlerFunc
 		cmd.CurrentUserId = currentUserId.(string)
 		cmd.CurrentUserType = currentUserType.(string)
 		id := c.Request.URL.Query().Get("id")
+		flag := ""
+		flag = c.Request.URL.Query().Get("resp")
 		if id == "" {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(ErrGroupSubjectIdNotProvided))
 			return
@@ -160,7 +162,12 @@ func (h *httpEndpoints) MakeListLessonByGroupSubjectIdEndpoint() gin.HandlerFunc
 			return
 		}
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
-		respondJSON(c.Writer, http.StatusOK, common.Resp{Objects: resp})
+		if flag == "mobile" {
+			respondJSON(c.Writer, http.StatusOK, resp)
+		} else {
+			respondJSON(c.Writer, http.StatusOK, common.Resp{Objects: resp})
+		}
+
 	}
 }
 
