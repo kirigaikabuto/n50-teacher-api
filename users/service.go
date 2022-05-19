@@ -16,6 +16,7 @@ type UserService interface {
 	GetUserByUsernameAndPassword(cmd *GetUserByUsernameAndPassword) (*User, error)
 	Login(cmd *LoginCommand) (*auth.TokenDetails, error)
 	CreateUserByAdmin(cmd *CreateUserByAdminCommand) (*User, error)
+	GetUserByToken(cmd *GetUserByTokenCommand) (*User, error)
 }
 
 type userService struct {
@@ -128,4 +129,12 @@ func (u *userService) Login(cmd *LoginCommand) (*auth.TokenDetails, error) {
 		return nil, err
 	}
 	return token, nil
+}
+
+func (u *userService) GetUserByToken(cmd *GetUserByTokenCommand) (*User, error) {
+	user, err := u.userStore.Get(cmd.UserId)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }

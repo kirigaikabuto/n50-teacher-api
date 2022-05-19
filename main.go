@@ -162,6 +162,7 @@ func run(c *cli.Context) error {
 	{
 		authGroup.POST("/login", usersHttpEndpoints.MakeLoginEndpoint())
 		authGroup.POST("/register", authMdw.MakeMiddleware(), usersHttpEndpoints.MakeCreateUserByAdminEndpoint())
+		authGroup.GET("/user", authMdw.MakeMiddleware(), usersHttpEndpoints.MakeGetUserByTokenEndpoint())
 	}
 	groupGroups := r.Group("/group", authMdw.MakeMiddleware())
 	{

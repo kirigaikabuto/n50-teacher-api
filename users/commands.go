@@ -85,3 +85,11 @@ type LoginCommand struct {
 func (cmd *LoginCommand) Exec(svc interface{}) (interface{}, error) {
 	return svc.(UserService).Login(cmd)
 }
+
+type GetUserByTokenCommand struct {
+	UserId string `json:"user_id"`
+}
+
+func (cmd *GetUserByTokenCommand) Exec(svc interface{}) (interface{}, error) {
+	return svc.(UserService).GetUserByToken(cmd)
+}
