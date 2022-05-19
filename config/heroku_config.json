@@ -1,11 +1,11 @@
 {
   "db": {
     "primary": {
-      "host": "ec2-52-212-228-71.eu-west-1.compute.amazonaws.com",
+      "host": "ec2-54-76-43-89.eu-west-1.compute.amazonaws.com",
       "port": 5432,
-      "name": "d9b8gjuf949ebm",
-      "user": "xbjlijbxvdbvxj",
-      "pass": "b5cdb47a4e69ae6bd01479308fe0d95be36c70d20af6ff91814570a00d444bf5",
+      "name": "d61pvjpeerkhq6",
+      "user": "lyfnxlttdygeqo",
+      "pass": "6e47c850ccedb201e73ac6a96316518e0b2f37295b76b5386d1ec78d3cd23ec9",
       "param": ""
     }
   },
