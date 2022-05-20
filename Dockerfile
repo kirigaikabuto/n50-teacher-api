@@ -18,4 +18,4 @@ EXPOSE 5000
 RUN go build -o main .
 
 # Command to run the executable
-CMD ./main -c=heroku_config
+CMD ./main -c=docker_config
