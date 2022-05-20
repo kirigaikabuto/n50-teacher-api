@@ -89,16 +89,6 @@ func (h *httpEndpoints) MakeGetUserByTokenEndpoint() gin.HandlerFunc {
 			return
 		}
 		cmd.UserId = currentUserId.(string)
-		jsonData, err := ioutil.ReadAll(c.Request.Body)
-		if err != nil {
-			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
-			return
-		}
-		err = json.Unmarshal(jsonData, &cmd)
-		if err != nil {
-			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
-			return
-		}
 		resp, err := h.ch.ExecCommand(cmd)
 		if err != nil {
 			respondJSON(c.Writer, http.StatusInternalServerError, setdata_common.ErrToHttpResponse(err))
