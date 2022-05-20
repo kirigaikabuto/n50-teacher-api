@@ -81,3 +81,5 @@ groups->get user group by token
 groups-> get by id
 
 {{host}}/group/id?id=[group_id]
+
+ssh -i cities.pem ubuntu@ec2-3-224-35-128.compute-1.amazonaws.com
